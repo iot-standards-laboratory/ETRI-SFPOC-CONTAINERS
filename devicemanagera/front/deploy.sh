@@ -1,0 +1,1 @@
+sed "s/template/svc\/serviceid/g" build/web/template.index.html > build/web/index.html

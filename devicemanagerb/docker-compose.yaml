@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  devicemanagerb:
+    build: .
+    image: devicemanagerb
+    hostname: devicemanagerb
