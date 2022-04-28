@@ -43,10 +43,10 @@ func UpdateMeasurement(cid, did string, status map[string]interface{}) error {
 		return errors.New("wrong cid is transmitted")
 	}
 
-	msmt, ok := measurements["did"]
+	msmt, ok := measurements[did]
 	if !ok {
 		_uuid, _ := uuid.NewV4()
-		measurements["did"] = &MeasurementData{
+		measurements[did] = &MeasurementData{
 			ID:     _uuid.String(),
 			Tags:   []string{did},
 			Status: status,
@@ -55,7 +55,7 @@ func UpdateMeasurement(cid, did string, status map[string]interface{}) error {
 		msmt.Status = status
 	}
 
-	log.Println("update:", measurements["did"])
+	log.Println("update:", measurements[did])
 	return nil
 }
 

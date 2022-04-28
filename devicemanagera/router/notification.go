@@ -2,6 +2,7 @@ package router
 
 import (
 	"devicemanagera/notifier"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -20,6 +21,18 @@ func GetPublish(c *gin.Context) {
 	_complete := make(chan int)
 	_uuid, _ := uuid.NewV4()
 
+	path := c.Param("any")
+	fmt.Println(path)
+
+	var subtoken string
+	if len(path) <= lengthOfPushPrefix {
+		subtoken = notifier.SubtokenStatusChanged
+	} else if path[lengthOfPushPrefix-1] != '/' {
+		return
+	} else {
+		subtoken = path[lengthOfPushPrefix:]
+	}
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.Writer.WriteHeader(http.StatusBadRequest)
@@ -29,7 +42,7 @@ func GetPublish(c *gin.Context) {
 
 	subscriber := notifier.NewWebsocketSubscriber(
 		_uuid.String(),
-		notifier.SubtokenStatusChanged,
+		subtoken,
 		notifier.SubtypeCont,
 		_complete,
 		conn,

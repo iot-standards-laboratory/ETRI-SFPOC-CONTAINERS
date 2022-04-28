@@ -60,6 +60,7 @@ func GetStatus(c *gin.Context) {
 		panic(errors.New("bad request - you should import did to header"))
 	}
 
+	fmt.Println("did:", did)
 	msmt, err := model.GetMeasurement(did)
 	if err != nil {
 		panic(err)
@@ -145,27 +146,37 @@ func GetStatus(c *gin.Context) {
 
 // }
 
-// func PostCtrl(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
+func PostStatus(c *gin.Context) {
+	defer handleError(c)
+	report := map[string]interface{}{}
+	err := c.BindJSON(&report)
+	if err != nil {
+		panic(err)
+	}
+	did, ok := report["did"].(string)
+	if !ok {
+		panic(errors.New("bad request - you should import did to request"))
+	}
 
-// 	_status := map[string]interface{}{}
-// 	decoder := json.NewDecoder(r.Body)
-// 	err := decoder.Decode(&_status)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		w.Write([]byte(err.Error()))
-// 		return
-// 	}
+	cid, ok := report["cid"].(string)
+	if !ok {
+		panic(errors.New("bad request - you should import cid to request"))
+	}
 
-// 	did, ok := vars["id"]
-// 	if !ok {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		w.Write([]byte(err.Error()))
-// 		return
-// 	}
+	status, ok := report["status"].(map[string]interface{})
+	if !ok {
+		panic(errors.New("bad request - you should import state to request"))
+	}
 
-// 	state[did] = _status
-// 	log.Println(_status)
+	box.Publish(notifier.NewPushEvent(
+		"control",
+		map[string]interface{}{
+			"did":    did,
+			"cid":    cid,
+			"status": status,
+		},
+		cid,
+	))
 
-// 	w.WriteHeader(http.StatusOK)
-// }
+	c.String(http.StatusOK, "OK")
+}
