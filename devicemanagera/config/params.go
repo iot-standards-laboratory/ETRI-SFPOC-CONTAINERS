@@ -17,7 +17,6 @@ var serverAddr string
 var MyIP string
 
 func LoadConfig() {
-
 	p := properties.MustLoadFile("./config.properties", properties.UTF8)
 	Params["serverAddr"] = p.GetString("serverAddr", serverAddr)
 	Params["bind"] = p.GetString("bind", ":4000")
@@ -32,11 +31,22 @@ func CreateInitFile() {
 		panic(err)
 	}
 	defer f.Close()
+
 	MyIP = getIP()
 	idx := strings.LastIndex(MyIP, ".")
 	serverAddr = MyIP[:idx+1] + "1:3000"
+
+	var operatingMode OperatingMode
+	mode := os.Getenv("mode")
+	if len(mode) == 0 || strings.Compare(mode, string(STANDALONE)) == 0 {
+		operatingMode = STANDALONE
+	} else {
+		operatingMode = MANAGEDBYEDGE
+	}
+
 	p := properties.NewProperties()
 	p.SetValue("serverAddr", serverAddr)
+	p.SetValue("mode", operatingMode)
 	p.SetValue("bind", ":9000")
 	p.SetValue("sname", "devicemanagera")
 	p.SetValue("sid", "blank")

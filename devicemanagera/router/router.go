@@ -1,6 +1,7 @@
 package router
 
 import (
+	"devicemanagera/config"
 	"devicemanagera/notifier"
 	"net/http"
 	"strings"
@@ -21,7 +22,11 @@ func init() {
 var lengthOfPushPrefix int
 
 func NewRouter(sid string) *gin.Engine {
-	prefix := "/svc/" + sid
+	var prefix = ""
+
+	if len(config.Params["sid"].(string)) == 0 {
+		prefix = "/svc/" + sid
+	}
 	apiEngine := gin.New()
 
 	apiv1 := apiEngine.Group(prefix + "/api/v1")

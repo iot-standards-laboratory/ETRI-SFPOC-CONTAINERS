@@ -1,0 +1,2 @@
+GET http://localhost:9000/api/v1/status
+did:5f78c691-30bb-4b78-8ee3-60bda7fe3c1e

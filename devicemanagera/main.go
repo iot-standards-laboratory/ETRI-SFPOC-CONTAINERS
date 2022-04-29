@@ -5,7 +5,6 @@ import (
 	"devicemanagera/router"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 )
@@ -39,9 +38,11 @@ func main() {
 	config.LoadConfig()
 	// register
 	if config.Params["sid"] == "blank" {
-		registerToServer()
-	} else {
-		fmt.Println(config.Params["sid"])
+		if config.Params["mode"] == config.MANAGEDBYEDGE {
+			registerToServer()
+		} else {
+			config.Set("sid", "")
+		}
 	}
 
 	router.NewRouter(config.Params["sid"].(string)).Run(config.Params["bind"].(string))
