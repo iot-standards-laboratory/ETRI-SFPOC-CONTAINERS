@@ -7,6 +7,8 @@ import (
 	"errors"
 	"net/http"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 func registerToServer() {
@@ -41,7 +43,11 @@ func main() {
 		if config.Params["mode"] == config.MANAGEDBYEDGE {
 			registerToServer()
 		} else {
-			config.Set("sid", "")
+			_uuid, err := uuid.NewUUID()
+			if err != nil {
+				panic(err)
+			}
+			config.Set("sid", _uuid.String())
 		}
 	}
 
