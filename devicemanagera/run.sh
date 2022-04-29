@@ -1,1 +1,1 @@
-mode="standalone" go run main.go
+mode="managedbyedge" go run main.go

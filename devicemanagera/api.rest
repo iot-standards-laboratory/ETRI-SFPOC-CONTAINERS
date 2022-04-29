@@ -1,0 +1,16 @@
+GET http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/devs/list
+
+GET http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/status
+did:a90b6090-c761-11ec-b7c0-00d861a99de2
+
+POST http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/status
+
+{
+    "did": "2c6395b7-c784-11ec-acab-00d861a99de2",
+    "dname": "DEVICE-A-UUID",
+    "cid": "2ab348bd-c784-11ec-acab-00d861a99de2",
+    "status": {
+        "fan": false,
+        "lamp": false
+    }
+}

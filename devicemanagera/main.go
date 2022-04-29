@@ -3,15 +3,16 @@ package main
 import (
 	"devicemanagera/config"
 	"devicemanagera/router"
-	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 )
 
-func registerToServer() {
+func registerToEdge() {
 	req, err := http.NewRequest("PUT", "http://"+config.Params["serverAddr"].(string)+"/api/v1/svcs", nil)
 	if err != nil {
 		panic(err)
@@ -24,11 +25,29 @@ func registerToServer() {
 	if err != nil {
 		panic(err)
 	}
-	var info map[string]interface{}
-	dec := json.NewDecoder(resp.Body)
-	dec.Decode(&info)
 
-	config.Set("sid", info["sid"].(string))
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	config.Set("sid", string(b))
+}
+
+func reconnectToEdge(sid string) {
+	req, err := http.NewRequest("PUT", "http://"+config.Params["serverAddr"].(string)+"/api/v1/svcs/"+sid, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header.Add("sname", config.Params["sname"].(string))
+	req.Header.Add("port", config.Params["bind"].(string))
+
+	_, err = http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func main() {
@@ -39,15 +58,19 @@ func main() {
 
 	config.LoadConfig()
 	// register
-	if config.Params["sid"] == "blank" {
-		if config.Params["mode"] == config.MANAGEDBYEDGE {
-			registerToServer()
+	if strings.Compare(config.Params["sid"].(string), "blank") == 0 {
+		if strings.Compare(config.Params["mode"].(string), string(config.MANAGEDBYEDGE)) == 0 {
+			registerToEdge()
 		} else {
 			_uuid, err := uuid.NewUUID()
 			if err != nil {
 				panic(err)
 			}
 			config.Set("sid", _uuid.String())
+		}
+	} else {
+		if strings.Compare(config.Params["mode"].(string), string(config.MANAGEDBYEDGE)) == 0 {
+			reconnectToEdge(config.Params["sid"].(string))
 		}
 	}
 

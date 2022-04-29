@@ -19,6 +19,7 @@ var MyIP string
 func LoadConfig() {
 	p := properties.MustLoadFile("./config.properties", properties.UTF8)
 	Params["serverAddr"] = p.GetString("serverAddr", serverAddr)
+	Params["mode"] = p.GetString("mode", "standalone")
 	Params["bind"] = p.GetString("bind", ":4000")
 	Params["sname"] = p.GetString("sname", "devicemanagera")
 	Params["sid"] = p.GetString("sid", "blank")

@@ -11,6 +11,10 @@ import (
 var devs = map[string]*Device{}
 var devMutex sync.Mutex
 
+// for debug
+func GetDevs() map[string]*Device {
+	return devs
+}
 func AddDev(dev *Device) error {
 	devMutex.Lock()
 	defer devMutex.Unlock()

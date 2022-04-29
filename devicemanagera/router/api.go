@@ -3,6 +3,7 @@ package router
 import (
 	"devicemanagera/model"
 	"devicemanagera/notifier"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 )
 
 func PostDevs(c *gin.Context) {
+	defer handleError(c)
 	var obj model.Device
 	fmt.Println("Wow")
 	c.BindJSON(&obj)
@@ -40,7 +42,8 @@ func PutStatusReport(c *gin.Context) {
 
 	status, ok := report["status"].(map[string]interface{})
 	if !ok {
-		panic(errors.New("bad request - you should import state to request"))
+		b, _ := json.Marshal(report)
+		panic(errors.New(fmt.Sprint("bad request -", string(b))))
 	}
 
 	err = model.UpdateMeasurement(cid, did, status)
@@ -50,6 +53,13 @@ func PutStatusReport(c *gin.Context) {
 
 	box.Publish(notifier.NewStatusChangedEvent("status changed", "status changed", notifier.SubtokenStatusChanged))
 	c.String(http.StatusOK, "OK")
+}
+
+// for debug
+func GetDevs(c *gin.Context) {
+	defer handleError(c)
+
+	c.JSON(http.StatusOK, model.GetDevs())
 }
 
 func GetStatus(c *gin.Context) {
@@ -148,6 +158,7 @@ func GetStatus(c *gin.Context) {
 
 func PostStatus(c *gin.Context) {
 	defer handleError(c)
+
 	report := map[string]interface{}{}
 	err := c.BindJSON(&report)
 	if err != nil {
@@ -165,7 +176,7 @@ func PostStatus(c *gin.Context) {
 
 	status, ok := report["status"].(map[string]interface{})
 	if !ok {
-		panic(errors.New("bad request - you should import state to request"))
+		panic(errors.New("bad request - you should import status to request"))
 	}
 
 	box.Publish(notifier.NewPushEvent(

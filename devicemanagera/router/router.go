@@ -24,13 +24,13 @@ var lengthOfPushPrefix int
 func NewRouter(sid string) *gin.Engine {
 	prefix := "/svc/" + config.Params["sid"].(string)
 	apiEngine := gin.New()
-
 	apiv1 := apiEngine.Group(prefix + "/api/v1")
 	{
+		apiv1.POST("/status", PostStatus)
 		apiv1.PUT("/status", PutStatusReport)
 		apiv1.GET("/status/*any", GetStatus)
-		apiv1.POST("/status", PostStatus)
-		apiv1.POST("/dev", PostDevs)
+		apiv1.GET("/devs/list", GetDevs)
+		apiv1.POST("/devs", PostDevs)
 	}
 
 	assetEngine := gin.New()
