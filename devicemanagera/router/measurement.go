@@ -55,6 +55,7 @@ func PostStatus(c *gin.Context) {
 	defer handleError(c)
 
 	path := c.Param("any")
+
 	if len(path) <= 1 {
 		// create measurement data
 		report := map[string]interface{}{}
@@ -67,12 +68,19 @@ func PostStatus(c *gin.Context) {
 			panic(errors.New("bad request - you should import did to request"))
 		}
 
+		name, ok := report["name"].(string)
+		if !ok {
+			name = ""
+		}
+
 		status, ok := report["status"].(map[string]interface{})
 		if !ok {
 			status = nil
 		}
 
-		mid, err := model.CreateMeasurement(did, status)
+		fmt.Println(report)
+
+		mid, err := model.CreateMeasurement(did, name, status)
 		if err != nil {
 			panic(err)
 		}
@@ -121,10 +129,11 @@ func PostStatus(c *gin.Context) {
 		}
 
 		for _, cid := range cids {
+			fmt.Println("send to", cid)
 			box.Publish(
 				notifier.NewPushEvent(
 					"control",
-					status,
+					report,
 					cid,
 				),
 			)
@@ -132,10 +141,9 @@ func PostStatus(c *gin.Context) {
 
 		c.String(http.StatusOK, "OK")
 	}
-
 }
 
-func PutStatusReport(c *gin.Context) {
+func PutStatus(c *gin.Context) {
 	defer handleError(c)
 
 	path := c.Param("any")

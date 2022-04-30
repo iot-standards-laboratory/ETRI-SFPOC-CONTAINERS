@@ -27,7 +27,7 @@ func NewRouter(sid string) *gin.Engine {
 	apiv1 := apiEngine.Group(prefix + "/api/v1")
 	{
 		apiv1.POST("/status/*any", PostStatus)
-		apiv1.PUT("/status/*any", PutStatusReport)
+		apiv1.PUT("/status/*any", PutStatus)
 		apiv1.GET("/status/*any", GetStatus)
 		apiv1.GET("/devs/list", GetDevs)
 		apiv1.POST("/devs", PostDevs)

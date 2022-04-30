@@ -1,31 +1,71 @@
-POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs
+@sid = 17949aee-c879-11ec-a28f-5254009af0ec
+@did = 10144d8d-c87b-11ec-8940-00d861a99de2
+@cid = 0e7d5b8d-c87b-11ec-8940-00d861a99de2
+@mid = ce11ee11-c87e-11ec-8fc5-5254009af0ec
+POST http://localhost:9000/svc/{{sid}}/api/v1/devs
 
 {
-    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c9276",
-    "dname": "DEVICE-A-UUID",
-    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "did": "{{did}}",
+    "dname": "DEVICE-B-UUID",
+    "cid": "{{cid}}",
     "sname": "devicemanagera"
 }
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs/list
+GET http://localhost:9000/svc/{{sid}}/api/v1/devs/list
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+GET http://localhost:9000/svc/{{sid}}/api/v1/status
 
-POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+POST http://localhost:9000/svc/{{sid}}/api/v1/status
 
 {
-    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c9276",
+    "did": "{{did}}",
     "dname": "DEVICE-A-UUID",
-    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "cid": "{{cid}}",
+    "name": "measured data",
+    "status": {
+        "fan": false
+    }
+}
+
+GET http://localhost:9000/svc/{{sid}}/api/v1/status
+did: {{did}}
+
+
+POST http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
     "status": {
         "fan": false,
         "lamp": false
     }
 }
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
 
-POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs
+POST http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
+    "status": {
+        "fan": true,
+        "lamp": true
+    }
+}
+
+PUT http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
+    "status": {
+        "Temp": 30,
+        "Humidity": 10
+    }
+}
+
+GET http://localhost:9000/svc/{{sid}}/api/v1/status
+did: {{did}}
+
+POST http://localhost:9000/svc/{{sid}}/api/v1/devs
 
 {
     "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
@@ -34,7 +74,7 @@ POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs
     "sname": "devicemanagera"
 }
 
-POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+POST http://localhost:9000/svc/{{sid}}/api/v1/status
 
 {
     "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
@@ -46,20 +86,9 @@ POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/statu
     }
 }
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+GET http://localhost:9000/svc/{{sid}}/api/v1/status
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
-did: 1ad73898-fe73-4053-8bbd-29a6ac6c9276
 
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
+GET http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
 
-POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
-
-{
-    "status": {
-        "fan": true,
-        "lamp": false
-    }
-}
-
-GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
+GET http://localhost:9000/svc/{{sid}}/api/v1/status/b9539103-c879-11ec-a28f-5254009af0ec
