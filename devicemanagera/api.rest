@@ -1,16 +1,65 @@
-GET http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/devs/list
-
-GET http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/status
-did:a90b6090-c761-11ec-b7c0-00d861a99de2
-
-POST http://localhost:9000/svc/23f87feb-c784-11ec-aad4-5254009af0ec/api/v1/status
+POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs
 
 {
-    "did": "2c6395b7-c784-11ec-acab-00d861a99de2",
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c9276",
     "dname": "DEVICE-A-UUID",
-    "cid": "2ab348bd-c784-11ec-acab-00d861a99de2",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "sname": "devicemanagera"
+}
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs/list
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+
+POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+
+{
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c9276",
+    "dname": "DEVICE-A-UUID",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
     "status": {
         "fan": false,
         "lamp": false
     }
 }
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+
+POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/devs
+
+{
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
+    "dname": "DEVICE-A-UUID",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "sname": "devicemanagera"
+}
+
+POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+
+{
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
+    "dname": "DEVICE-B-UUID",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "status": {
+        "fan": false,
+        "lamp": false
+    }
+}
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status
+did: 1ad73898-fe73-4053-8bbd-29a6ac6c9276
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
+
+POST http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
+
+{
+    "status": {
+        "fan": true,
+        "lamp": false
+    }
+}
+
+GET http://localhost:9000/svc/df54f629-c827-11ec-ad49-5254009af0ec/api/v1/status/5a2414c0-c82e-11ec-808a-5254009af0ec
