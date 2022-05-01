@@ -2,7 +2,7 @@
 
 @did = 10144d8d-c87b-11ec-8940-00d861a99de2
 @cid = 0e7d5b8d-c87b-11ec-8940-00d861a99de2
-@mid = ce11ee11-c87e-11ec-8fc5-5254009af0ec
+@mid = fd759394-c9a3-11ec-9d1d-00d861a99de2
 POST http://localhost:9000/svc/{{sid}}/api/v1/devs
 
 {

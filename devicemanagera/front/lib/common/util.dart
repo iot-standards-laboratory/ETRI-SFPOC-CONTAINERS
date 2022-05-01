@@ -1,9 +1,9 @@
-String getURL(String path) {
-  var url = '${Uri.base.path}/$path';
+Uri getUri(String addr, String path) {
+  var url = '$addr/$path';
 
   while (url.contains("//")) {
     url = url.replaceAll('//', "/");
   }
 
-  return url;
+  return Uri.parse(url);
 }

@@ -84,7 +84,7 @@ func PostStatus(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-
+		box.Publish(notifier.NewStatusChangedEvent("poststatus", "poststatus", notifier.SubtokenStatusChanged))
 		c.String(http.StatusCreated, mid)
 	} else {
 		// handle control message
@@ -176,6 +176,6 @@ func PutStatus(c *gin.Context) {
 		panic(err)
 	}
 
-	box.Publish(notifier.NewStatusChangedEvent("status changed", "status changed", mid))
+	box.Publish(notifier.NewStatusChangedEvent("putstatus", "putstatus", notifier.SubtokenStatusChanged))
 	c.String(http.StatusOK, "OK")
 }
