@@ -5,7 +5,7 @@ import 'package:front/controller/http_handle.dart';
 import 'package:front/controller/main_controlelr.dart';
 import 'package:get/get.dart';
 
-import 'controller/ws.dart';
+// import 'controller/ws.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,31 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'sensingValue',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            GetBuilder<MainController>(builder: (ctrl) {
-              return Text(
-                '${ctrl.sensingValue}',
-                style: Theme.of(context).textTheme.headline4,
-              );
-            }),
-            Text(
-              'ctrlValue',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            GetBuilder<MainController>(builder: (ctrl) {
-              return Text(
-                '$_ctrlValue',
-                style: Theme.of(context).textTheme.headline4,
-              );
-            }),
-          ],
-        ),
+        child: Container(width: 100, height: 100, color: Colors.red),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,

@@ -23,5 +23,9 @@ func PostDevs(c *gin.Context) {
 func GetDevs(c *gin.Context) {
 	defer handleError(c)
 
-	c.JSON(http.StatusOK, model.GetDevs())
+	devs := make([]*model.Device, 0, 10)
+	for _, v := range model.GetDevs() {
+		devs = append(devs, v)
+	}
+	c.JSON(http.StatusOK, devs)
 }

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"devicemanagera/config"
 	"devicemanagera/router"
 	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -50,6 +53,37 @@ func reconnectToEdge(sid string) {
 
 }
 
+func makeIndex(sid string) {
+	template, err := os.Open("./front/build/web/template.index.html")
+	if err != nil {
+		panic(err)
+	}
+	defer template.Close()
+	index, err := os.Create("./front/build/web/index.html")
+	if err != nil {
+		panic(err)
+	}
+	defer index.Close()
+
+	reader := bufio.NewReader(template)
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			panic(err)
+		} else if strings.Contains(line, `<base href="/svc/{{serviceid}}/">`) {
+			fmt.Fprintf(index, `<base href="/svc/%s/">`, sid)
+			break
+		} else {
+			fmt.Fprint(index, line)
+		}
+	}
+
+	_, err = io.Copy(index, reader)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	if _, err := os.Stat("./config.properties"); errors.Is(err, os.ErrNotExist) {
 		// path/to/whatever does not exist
@@ -68,6 +102,9 @@ func main() {
 			}
 			config.Set("sid", _uuid.String())
 		}
+
+		// make index file
+		makeIndex(config.Params["sid"].(string))
 	} else {
 		if strings.Compare(config.Params["mode"].(string), string(config.MANAGEDBYEDGE)) == 0 {
 			reconnectToEdge(config.Params["sid"].(string))
