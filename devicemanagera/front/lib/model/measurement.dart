@@ -17,9 +17,9 @@ class MeasurementData {
     var status = <Status>[];
 
     if (json["status"] is List<dynamic>) {
-      (json["status"] as List<dynamic>).forEach((element) {
+      for (var element in (json["status"] as List<dynamic>)) {
         status.add(Status.fromJson(element));
-      });
+      }
     }
 
     return MeasurementData(
@@ -32,15 +32,15 @@ class MeasurementData {
   @override
   String toString() {
     var statusList = <dynamic>[];
-    this.status.forEach((element) {
+    for (var element in status) {
       statusList.add(element.toMap());
-    });
+    }
 
     var obj = {
-      "id": this.id,
-      "name": this.name,
+      "id": id,
+      "name": name,
       "status": statusList,
-      "tags": this.tags,
+      "tags": tags,
     };
     return jsonEncode(obj);
   }
@@ -62,7 +62,6 @@ class Status {
   });
 
   factory Status.fromJson(dynamic json) {
-    print(json);
     return Status(
       key: json["Key"],
       type: json["Type"],
@@ -74,11 +73,11 @@ class Status {
 
   dynamic toMap() {
     var obj = {
-      "key": this.key,
-      "type": this.type,
-      "unit": this.unit,
-      "description": this.description,
-      "value": this.value,
+      "key": key,
+      "type": type,
+      "unit": unit,
+      "description": description,
+      "value": value,
     };
     return obj;
   }
