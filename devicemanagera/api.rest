@@ -90,7 +90,6 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/status
 
 GET http://localhost:9000/svc/{{sid}}/api/v1/status
 
-
 GET http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
 
 GET http://localhost:9000/svc/{{sid}}/api/v1/status/b9539103-c879-11ec-a28f-5254009af0ec
