@@ -20,8 +20,8 @@ WORKDIR /home/build
 COPY --from=gobuild /home/build/devicemanager devicemanager
 COPY --from=gobuild /home/build/front front
 
-RUN chown -R ${PUID}:${PGID} /home/build/devicemanager
+RUN chown -R ${PUID}:${PGID} /home/build
 
 USER devicemanager
-
+ENV mode=managedbyedge
 CMD ["/home/build/devicemanager"]
