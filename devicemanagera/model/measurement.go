@@ -84,6 +84,12 @@ func CreateMeasurement(did string, name string, status map[string]interface{}) (
 		return "", errors.New("wrong did is transmitted")
 	}
 
+	// should be modified
+	rel, ok := relations[did]
+	if ok && len(rel) > 0 {
+		return measurements[rel[0].Identifier].ID, nil
+	}
+
 	_uuid, err := uuid.NewUUID()
 	if err != nil {
 		return "", err

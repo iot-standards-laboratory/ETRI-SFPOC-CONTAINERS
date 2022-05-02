@@ -1,9 +1,11 @@
-@sid = 6f392c3b-c99a-11ec-a2b3-00d861a99de2
+@sid = c510ebed-ca0b-11ec-b6da-00d861a99de2
 
-@did = 6639e056-c9d8-11ec-b85f-00d861a99de2
-@cid = 63f62914-c9d8-11ec-b85f-00d861a99de2
-@mid = 2f71d61b-c9d9-11ec-b014-00d861a99de2
-POST http://localhost:9000/svc/{{sid}}/api/v1/devs
+@did = 8f63ba8b-a4e9-4325-89d9-8d60f8ba47eb
+@cid = 718b558a-7112-458a-8028-6899fc1c12e4
+@mid = 5a401a73-ca0c-11ec-b6da-00d861a99de2
+
+@serverAddr = localhost:9000
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
 
 {
     "did": "{{did}}",
@@ -12,11 +14,11 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/devs
     "sname": "devicemanagera"
 }
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/devs/list
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/devs/list
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 
-POST http://localhost:9000/svc/{{sid}}/api/v1/status
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 
 {
     "did": "{{did}}",
@@ -28,22 +30,23 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/status
     }
 }
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 did: {{did}}
 
 
-POST http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
 
 {
     "did": "{{did}}",
+    "cid": "{{cid}}",
     "status": {
-        "fan": false,
-        "lamp": false
+        "fan": true,
+        "lamp": true
     }
 }
 
 
-POST http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
 
 {
     "did": "{{did}}",
@@ -54,7 +57,7 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
     }
 }
 
-PUT http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+PUT http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
 
 {
     "did": "{{did}}",
@@ -64,10 +67,10 @@ PUT http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
     }
 }
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 did: {{did}}
 
-POST http://localhost:9000/svc/{{sid}}/api/v1/devs
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
 
 {
     "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
@@ -76,7 +79,7 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/devs
     "sname": "devicemanagera"
 }
 
-POST http://localhost:9000/svc/{{sid}}/api/v1/status
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 
 {
     "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
@@ -88,8 +91,8 @@ POST http://localhost:9000/svc/{{sid}}/api/v1/status
     }
 }
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status/{{mid}}
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
 
-GET http://localhost:9000/svc/{{sid}}/api/v1/status/b9539103-c879-11ec-a28f-5254009af0ec
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status/b9539103-c879-11ec-a28f-5254009af0ec

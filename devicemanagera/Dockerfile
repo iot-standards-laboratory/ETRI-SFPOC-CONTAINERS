@@ -15,11 +15,13 @@ ARG PGID=2000
 RUN addgroup -g ${PGID} devicemanager && \
     adduser -H -D -u ${PUID} -G devicemanager devicemanager
 
-WORKDIR /opt/devicemanager
+WORKDIR /home/build
 
 COPY --from=gobuild /home/build/devicemanager devicemanager
-RUN chown -R ${PUID}:${PGID} /opt/devicemanager
+COPY --from=gobuild /home/build/front front
+
+RUN chown -R ${PUID}:${PGID} /home/build/devicemanager
 
 USER devicemanager
 
-CMD ["/opt/devicemanager/devicemanager"]
+CMD ["/home/build/devicemanager"]
