@@ -11,22 +11,19 @@ class MainController extends GetxController {
   // var devList =
   var ws = subscribeWithWebsocket();
   var devList = <Device>[];
-  var measurement = MeasurementData(id: "", status: <Status>[]);
-  var index = 0.obs;
+  var measurements = <String, MeasurementData>{};
 
   MainController() {
     ws.stream.listen((message) async {
-      print(message);
+      var push = jsonDecode(message);
+      if ((push["key"] as String).compareTo("putstatus") == 0) {
+        loadMeasurement();
+      } else {
+        loadDev();
+      }
       // loadData();
     });
     loadDev();
-  }
-
-  void changeIndex(int newIdx) {
-    if (index.value != newIdx) {
-      index.value = newIdx;
-    }
-    update();
   }
 
   void loadDev() async {
@@ -40,38 +37,40 @@ class MainController extends GetxController {
           devList.add(Device.fromJson(e));
         }
 
-        loadMeasurement();
+        await loadMeasurement();
       } on FormatException catch (e) {
         print(e);
       }
       // var response = await http.get(Uri.http(serverAddr, apiUrl));
 
-      update();
+      update(["devs"]);
     }
   }
 
-  void loadMeasurement() async {
-    if (index.value >= devList.length) return;
+  Future<int> loadMeasurement() async {
+    for (var dev in devList) {
+      var resp = await http.get(
+        getUri('', '${Uri.base.path}/api/v1/status'),
+        headers: <String, String>{"did": dev.did},
+      );
 
-    var resp = await http.get(
-      getUri('', '${Uri.base.path}/api/v1/status'),
-      headers: <String, String>{"did": devList[index.value].did},
-    );
+      if (resp.statusCode == 200) {
+        try {
+          var body = jsonDecode(resp.body);
 
-    if (resp.statusCode == 200) {
-      try {
-        var body = jsonDecode(resp.body);
+          if ((body as List<dynamic>).isEmpty) return 0;
 
-        if ((body as List<dynamic>).isEmpty) return;
-
-        measurement = MeasurementData.fromJson(body[0]);
-      } on FormatException catch (e) {
-        print(e);
+          var data = MeasurementData.fromJson(body[0]);
+          measurements[dev.did] = data;
+          print("update : ${data.id}");
+          update([data.id]);
+        } on FormatException catch (e) {
+          print(e);
+        }
       }
-      // var response = await http.get(Uri.http(serverAddr, apiUrl));
-
-      update(["status"]);
     }
+
+    return 0;
   }
 
   @override

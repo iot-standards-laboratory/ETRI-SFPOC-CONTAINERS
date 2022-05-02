@@ -118,6 +118,10 @@ func PostStatus(c *gin.Context) {
 			panic(err)
 		}
 
+		cid, ok := report["cid"].(string)
+		if !ok {
+			panic(errors.New("bad request - you should import cid to request"))
+		}
 		status, ok := report["status"].(map[string]interface{})
 		if !ok {
 			panic(errors.New("bad request - you should import status to request"))
@@ -128,16 +132,13 @@ func PostStatus(c *gin.Context) {
 			panic(err)
 		}
 
-		for _, cid := range cids {
-			fmt.Println("send to", cid)
-			box.Publish(
-				notifier.NewPushEvent(
-					"control",
-					report,
-					cid,
-				),
-			)
-		}
+		box.Publish(
+			notifier.NewPushEvent(
+				"control",
+				report,
+				cid,
+			),
+		)
 
 		c.String(http.StatusOK, "OK")
 	}
@@ -176,6 +177,6 @@ func PutStatus(c *gin.Context) {
 		panic(err)
 	}
 
-	box.Publish(notifier.NewStatusChangedEvent("putstatus", "putstatus", notifier.SubtokenStatusChanged))
+	box.Publish(notifier.NewStatusChangedEvent("putstatus", mid, notifier.SubtokenStatusChanged))
 	c.String(http.StatusOK, "OK")
 }

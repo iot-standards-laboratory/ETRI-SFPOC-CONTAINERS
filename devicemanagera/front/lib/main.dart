@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:front/constants.dart';
 import 'package:front/controller/http_handle.dart';
 import 'package:front/controller/main_controlelr.dart';
+import 'package:front/model/device.dart';
+import 'package:front/model/measurement.dart';
 import 'package:get/get.dart';
 
 // import 'controller/ws.dart';
@@ -40,17 +42,64 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _ctrlValue = 0;
-
-  void _incrementCounter() {
-    _ctrlValue += 100;
-    setState(() {});
-    postCtrl(_ctrlValue);
-  }
-
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Widget getStatusWidget(String did, MeasurementData? data) {
+    if (data == null) {
+      return Container();
+    } else {
+      print("get: ${data.id}");
+      return GetBuilder<MainController>(
+        id: data.id,
+        builder: (ctrl) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: ctrl.measurements[did]!.status
+                  .map(
+                    (e) => Text(
+                      "${e.key}: ${e.value} ${e.unit}",
+                      style: const TextStyle(fontSize: 22),
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Widget getDeviceWidget(Device dev, MeasurementData? data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "device name : ${dev.dname}",
+          style: const TextStyle(fontSize: 26),
+        ),
+        Text(
+          "device identifier : ${dev.did}",
+          style: const TextStyle(fontSize: 22),
+        ),
+        Text(
+          "controller id of device : ${dev.cid}",
+          style: const TextStyle(fontSize: 22),
+        ),
+        const Text(
+          "status :",
+          style: const TextStyle(fontSize: 22),
+        ),
+        getStatusWidget(dev.did, data),
+        const SizedBox(
+          height: 10,
+        )
+      ],
+    );
   }
 
   @override
@@ -59,14 +108,16 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Container(width: 100, height: 100, color: Colors.red),
+      body: GetBuilder<MainController>(
+        id: "devs",
+        builder: (controller) {
+          return ListView(
+            children: controller.devList
+                .map((e) => getDeviceWidget(e, controller.measurements[e.did]))
+                .toList(),
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
