@@ -1,7 +1,10 @@
-version: '3.8'
+version: '3.3'
 
 services:
+  
   devicemanagera:
     build: .
     image: devicemanagera
     hostname: devicemanagera
+    environment:
+      - "mode=managedbyedge"
