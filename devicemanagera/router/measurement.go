@@ -110,6 +110,7 @@ func PostStatus(c *gin.Context) {
 			}
 		}
 
+		// check cid
 		fmt.Println("cids: ", cids)
 
 		report := map[string]interface{}{}
@@ -118,27 +119,56 @@ func PostStatus(c *gin.Context) {
 			panic(err)
 		}
 
-		cid, ok := report["cid"].(string)
-		if !ok {
-			panic(errors.New("bad request - you should import cid to request"))
-		}
 		status, ok := report["status"].(map[string]interface{})
 		if !ok {
 			panic(errors.New("bad request - you should import status to request"))
 		}
+
+		// set payload
+		_, ok = status["fan"]
+		if !ok {
+			msmt, err := model.GetMeasurement(mid)
+			if err != nil {
+				panic(err)
+			}
+
+			for _, e := range msmt.Status {
+				if strings.Compare(e.Key, "fan") == 0 {
+					status["fan"] = e.Value
+				}
+			}
+		}
+
+		_, ok = status["lamp"]
+		if !ok {
+			msmt, err := model.GetMeasurement(mid)
+			if err != nil {
+				panic(err)
+			}
+
+			for _, e := range msmt.Status {
+				if strings.Compare(e.Key, "lamp") == 0 {
+					status["lamp"] = e.Value
+				}
+			}
+		}
+
+		fmt.Println("post ] -", report)
 
 		err = model.UpdateMeasurement(mid, status)
 		if err != nil {
 			panic(err)
 		}
 
-		box.Publish(
-			notifier.NewPushEvent(
-				"control",
-				report,
-				cid,
-			),
-		)
+		for _, cid := range cids {
+			box.Publish(
+				notifier.NewPushEvent(
+					"control",
+					report,
+					cid,
+				),
+			)
+		}
 
 		c.String(http.StatusOK, "OK")
 	}

@@ -51,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (data == null) {
       return Container();
     } else {
-      print("get: ${data.id}");
       return GetBuilder<MainController>(
         id: data.id,
         builder: (ctrl) {
@@ -59,9 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: const EdgeInsets.only(left: 50),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: ctrl
-                  .getMeasurementData(did)!
-                  .status
+              children: ctrl.msmts[data.id]!.status
                   .map(
                     (e) => Row(
                       children: <Widget>[
@@ -72,7 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         if ((e.type).compareTo("xs:boolean") == 0)
                           Switch(
                             onChanged: (value) {
-                              print(value);
+                              e.value = value;
+                              ctrl.postStatus(data.id, did, {e.key: value});
                             },
                             value: e.value,
                           ),
@@ -133,10 +131,18 @@ class _MyHomePageState extends State<MyHomePage> {
         id: "devs",
         builder: (controller) {
           return ListView(
-            children: controller.devList
-                .map((e) =>
-                    getDeviceWidget(e, controller.getMeasurementData(e.did)))
-                .toList(),
+            children: controller.devList.map((e) {
+              var list = controller.relations.getRelatedElements(e.did);
+
+              if (list!.isEmpty) {
+                return Container();
+              }
+
+              return getDeviceWidget(
+                e,
+                list[0] as MeasurementData,
+              );
+            }).toList(),
           );
         },
       ),

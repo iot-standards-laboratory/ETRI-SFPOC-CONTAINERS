@@ -4,7 +4,7 @@ class MeasurementData {
   final String id;
   final String? name;
   final List<dynamic>? tags;
-  final List<Status> status;
+  List<Status> status;
 
   MeasurementData({
     required this.id,
@@ -50,7 +50,7 @@ class Status {
   final String key;
   final String type;
   final String unit;
-  final dynamic value;
+  dynamic value;
   final String? description;
 
   Status({

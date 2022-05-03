@@ -19,7 +19,7 @@ class MainController extends GetxController {
     ws.stream.listen((message) async {
       var push = jsonDecode(message);
       if ((push["key"] as String).compareTo("putstatus") == 0) {
-        loadMeasurement("a");
+        loadMeasurement(push["value"]);
       } else {
         loadDev();
       }
@@ -35,6 +35,7 @@ class MainController extends GetxController {
       try {
         var body = jsonDecode(resp.body);
 
+        devList.clear();
         for (var e in body as List<dynamic>) {
           devList.add(Device.fromJson(e));
         }
@@ -49,22 +50,36 @@ class MainController extends GetxController {
     }
   }
 
-  MeasurementData? getMeasurementData(String did) {
-    var list = relations.getRelatedElements(did);
-    if (list == null) {
-      return null;
-    }
-    for (var e in list) {
-      if (e is MeasurementData) {
-        return e;
-      }
-    }
+  // MeasurementData? getMeasurementData(String did) {
+  //   var list = relations.getRelatedElements(did);
+  //   if (list == null) {
+  //     return null;
+  //   }
+  //   for (var e in list) {
+  //     if (e is MeasurementData) {
+  //       return e;
+  //     }
+  //   }
 
-    return null;
+  //   return null;
+  // }
+
+  void postStatus(String mid, String did, dynamic status) {
+    var body = <String, dynamic>{
+      "did": did,
+      "status": status,
+    };
+    http.post(
+      getUri('', '${Uri.base.path}/api/v1/status/$mid'),
+      body: jsonEncode(body),
+    );
+
+    update([mid]);
   }
 
   Future<int> loadMeasurement(String mid) async {
     if (mid.isEmpty) {
+      msmts.clear();
       for (var dev in devList) {
         var resp = await http.get(
           getUri('', '${Uri.base.path}/api/v1/status'),
@@ -87,7 +102,25 @@ class MainController extends GetxController {
           }
         }
       }
-    } else {}
+    } else {
+      var resp = await http.get(
+        getUri('', '${Uri.base.path}/api/v1/status/$mid'),
+      );
+
+      if (resp.statusCode == 200) {
+        try {
+          var body = jsonDecode(resp.body);
+
+          var data = MeasurementData.fromJson(body);
+          var msmt = msmts[mid];
+
+          msmt!.status = data.status;
+          update([data.id]);
+        } on FormatException catch (e) {
+          print(e);
+        }
+      }
+    }
 
     return 0;
   }
