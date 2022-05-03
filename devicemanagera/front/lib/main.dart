@@ -59,7 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: const EdgeInsets.only(left: 50),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: ctrl.measurements[did]!.status
+              children: ctrl
+                  .getMeasurementData(did)!
+                  .status
                   .map(
                     (e) => Row(
                       children: <Widget>[
@@ -132,7 +134,8 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (controller) {
           return ListView(
             children: controller.devList
-                .map((e) => getDeviceWidget(e, controller.measurements[e.did]))
+                .map((e) =>
+                    getDeviceWidget(e, controller.getMeasurementData(e.did)))
                 .toList(),
           );
         },

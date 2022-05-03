@@ -18,7 +18,7 @@ class RelationMapper {
     }
   }
 
-  List<dynamic>? getRelation(String key) {
+  List<dynamic>? getRelatedElements(String key) {
     return _storage[key];
   }
 }
