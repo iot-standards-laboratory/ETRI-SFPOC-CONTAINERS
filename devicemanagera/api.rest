@@ -1,15 +1,15 @@
-@sid = 7725dc67-3ae3-428f-bf6a-b2d28188cd57
+@sid = 3a2b6927-ca28-11ec-83f4-00d861a99de2
 
-@did = 8f63ba8b-a4e9-4325-89d9-8d60f8ba47eb
+@did = 8f63ba8b-a4e9-4325-89d9-8d60f8ba47eC
 @cid = 718b558a-7112-458a-8028-6899fc1c12e4
 @mid = 5a401a73-ca0c-11ec-b6da-00d861a99de2
 
-@serverAddr = dsad:3000
+@serverAddr = localhost:9000
 POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
 
 {
     "did": "{{did}}",
-    "dname": "DEVICE-B-UUID",
+    "dname": "DEVICE-A-UUID",
     "cid": "{{cid}}",
     "sname": "devicemanagera"
 }

@@ -56,14 +56,30 @@ class _MyHomePageState extends State<MyHomePage> {
         id: data.id,
         builder: (ctrl) {
           return Padding(
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 50),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: ctrl.measurements[did]!.status
                   .map(
-                    (e) => Text(
-                      "${e.key}: ${e.value} ${e.unit}",
-                      style: const TextStyle(fontSize: 22),
+                    (e) => Row(
+                      children: <Widget>[
+                        Text(
+                          "${e.key}: ",
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                        if ((e.type).compareTo("xs:boolean") == 0)
+                          Switch(
+                            onChanged: (value) {
+                              print(value);
+                            },
+                            value: e.value,
+                          ),
+                        if ((e.type).compareTo("xs:boolean") != 0)
+                          Text(
+                            " ${e.value} ${e.unit}",
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                      ],
                     ),
                   )
                   .toList(),
@@ -75,30 +91,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget getDeviceWidget(Device dev, MeasurementData? data) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "device name : ${dev.dname}",
-          style: const TextStyle(fontSize: 26),
-        ),
-        Text(
-          "device identifier : ${dev.did}",
-          style: const TextStyle(fontSize: 22),
-        ),
-        Text(
-          "controller id of device : ${dev.cid}",
-          style: const TextStyle(fontSize: 22),
-        ),
-        const Text(
-          "status :",
-          style: const TextStyle(fontSize: 22),
-        ),
-        getStatusWidget(dev.did, data),
-        const SizedBox(
-          height: 10,
-        )
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "device name : ${dev.dname}",
+            style: const TextStyle(fontSize: 26),
+          ),
+          Text(
+            "device identifier : ${dev.did}",
+            style: const TextStyle(fontSize: 22),
+          ),
+          Text(
+            "controller id of device : ${dev.cid}",
+            style: const TextStyle(fontSize: 22),
+          ),
+          const Text(
+            "status :",
+            style: const TextStyle(fontSize: 22),
+          ),
+          getStatusWidget(dev.did, data),
+          const SizedBox(
+            height: 10,
+          )
+        ],
+      ),
     );
   }
 
