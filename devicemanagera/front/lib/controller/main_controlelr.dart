@@ -12,6 +12,7 @@ class MainController extends GetxController {
   var ws = subscribeWithWebsocket();
   var devList = <Device>[];
   var measurements = <String, MeasurementData>{};
+  var relations = <String, dynamic>{};
 
   MainController() {
     ws.stream.listen((message) async {
@@ -61,7 +62,7 @@ class MainController extends GetxController {
           if ((body as List<dynamic>).isEmpty) return 0;
 
           var data = MeasurementData.fromJson(body[0]);
-          measurements[dev.did] = data;
+          measurements[data.id] = data;
           print("update : ${data.id}");
           update([data.id]);
         } on FormatException catch (e) {
