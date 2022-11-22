@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"devicemanagera/consul_api"
 	"devicemanagera/model"
 	"devicemanagera/router"
 	"encoding/json"
@@ -82,14 +83,14 @@ func makeIndex() {
 
 	reader := bufio.NewReader(template)
 	for {
-		line, err := reader.ReadString('\n')
+		line, _, err := reader.ReadLine()
 		if err != nil {
 			panic(err)
-		} else if strings.Contains(line, `<base href="/svc/{{serviceid}}/">`) {
+		} else if strings.Contains(string(line), `<base href="/svc/{{serviceid}}">`) {
 			fmt.Fprintf(index, `<base href="/svc/%s/">`, model.SvcId)
 			break
 		} else {
-			fmt.Fprint(index, line)
+			fmt.Fprintln(index, string(line))
 		}
 	}
 
@@ -99,9 +100,34 @@ func makeIndex() {
 	}
 }
 
+func connectConsul(svcId, consulAddr, originAddr string) error {
+	key := fmt.Sprintf("svcs/%s", svcId)
+
+	err := consul_api.Connect(consulAddr)
+	if err != nil {
+		return err
+	}
+
+	err = consul_api.RegisterAgent(key, fmt.Sprintf("http://%s:3456", originAddr))
+	if err != nil {
+		return err
+	}
+
+	go consul_api.UpdateTTL(func() (bool, error) { return true, nil }, key)
+
+	// go consul_api.Monitor(func(s string) { fmt.Println(s) }, context.Background())
+
+	return nil
+}
+
 func main() {
 	// init
 	initService()
-	model.PrintParam()
-	router.NewRouter(model.SvcId).Run(":3579")
+	makeIndex()
+	// model.PrintParam()
+	err := connectConsul(model.SvcId, model.ConsulAddr, model.Origin)
+	if err != nil {
+		panic(err)
+	}
+	router.NewRouter(model.SvcId).Run(":3456")
 }

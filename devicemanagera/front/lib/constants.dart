@@ -11,5 +11,3 @@ const List<Color> kDefaultRainbowColors = [
   Colors.indigo,
   Colors.purple,
 ];
-
-var isLogin = false;

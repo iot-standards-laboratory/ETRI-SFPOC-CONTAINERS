@@ -191,19 +191,9 @@ class HomeController extends GetxController {
     loadHistory();
   }
 
-  final isReady = false.obs;
   @override
   void onReady() {
     super.onReady();
-    if (isLogin) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        isReady.value = true;
-      });
-      return;
-    }
-    Future.delayed(const Duration(milliseconds: 100), () {
-      Get.offAllNamed("/login");
-    });
   }
 
   @override

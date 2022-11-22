@@ -35,7 +35,6 @@ class LoginController extends GetxController {
   // }
   Future<bool> login() async {
     if (email == 'etri@etri.com' && password == 'etrietri') {
-      isLogin = true;
       return true;
     }
 

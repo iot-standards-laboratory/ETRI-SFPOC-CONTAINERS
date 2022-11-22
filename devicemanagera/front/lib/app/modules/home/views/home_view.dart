@@ -80,75 +80,71 @@ class HomeView extends GetView<HomeController> {
     return LayoutBuilder(builder: (context, ctis) {
       SizeConfig.init(context);
       return Obx(() {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 600),
-          opacity: controller.isReady.value ? 1 : 0,
-          child: SafeArea(
-            child: Scaffold(
-              key: controller.scaffoldKey,
-              drawer: const SizedBox(width: 100, child: SideMenu()),
-              appBar: !Responsive.isDesktop(context)
-                  ? AppBar(
-                      elevation: 0,
-                      backgroundColor: AppColors.primaryBg,
-                      leading: IconButton(
-                        onPressed: () {
-                          controller.scaffoldKey.currentState!.openDrawer();
-                        },
-                        icon: const Icon(Icons.menu, color: AppColors.black),
+        return SafeArea(
+          child: Scaffold(
+            key: controller.scaffoldKey,
+            drawer: const SizedBox(width: 100, child: SideMenu()),
+            appBar: !Responsive.isDesktop(context)
+                ? AppBar(
+                    elevation: 0,
+                    backgroundColor: AppColors.primaryBg,
+                    leading: IconButton(
+                      onPressed: () {
+                        controller.scaffoldKey.currentState!.openDrawer();
+                      },
+                      icon: const Icon(Icons.menu, color: AppColors.black),
+                    ),
+                    title: Text(
+                      "Smart Farm",
+                      style: GoogleFonts.sofia(
+                        fontSize: 24,
+                        color: Colors.grey[850],
+                        fontWeight: FontWeight.w800,
                       ),
-                      title: Text(
-                        "Smart Farm",
-                        style: GoogleFonts.sofia(
-                          fontSize: 24,
-                          color: Colors.grey[850],
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      actions: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: const Color.fromARGB(255, 25, 71, 223),
-                            ),
-                            width: 80,
-                            // height: 52,
-                            child: const Center(
-                              child: Text(
-                                "Container",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
+                    ),
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: const Color.fromARGB(255, 25, 71, 223),
+                          ),
+                          width: 80,
+                          // height: 52,
+                          child: const Center(
+                            child: Text(
+                              "Container",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
                             ),
                           ),
                         ),
-                      ],
-                    )
-                  : const PreferredSize(
-                      preferredSize: Size.zero,
-                      child: SizedBox(),
-                    ),
-              body: Row(
-                children: [
-                  if (Responsive.isDesktop(context))
-                    const Expanded(
-                      flex: 1,
-                      child: SideMenu(),
-                    ),
-                  Expanded(
-                    flex: 10,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Obx(
-                        () => renderBoard(controller.idx.value, context),
                       ),
+                    ],
+                  )
+                : const PreferredSize(
+                    preferredSize: Size.zero,
+                    child: SizedBox(),
+                  ),
+            body: Row(
+              children: [
+                if (Responsive.isDesktop(context))
+                  const Expanded(
+                    flex: 1,
+                    child: SideMenu(),
+                  ),
+                Expanded(
+                  flex: 10,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Obx(
+                      () => renderBoard(controller.idx.value, context),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
