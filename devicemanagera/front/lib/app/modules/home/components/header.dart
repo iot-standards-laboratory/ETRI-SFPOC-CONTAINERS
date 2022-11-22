@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:front/app/model/controller.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../controllers/home_controller.dart';
 import 'style/colors.dart';
 
 class Header extends StatelessWidget {
@@ -52,34 +55,26 @@ class Header extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  Container(
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 7,
-                          offset:
-                              const Offset(7, 7), // changes position of shadow
+                  GetBuilder<HomeController>(
+                    id: "reload",
+                    builder: (controller) {
+                      return SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: PopupMenuButton<Controller>(
+                          itemBuilder: (context) {
+                            return controller.ctrls
+                                .map(
+                                  (e) => PopupMenuItem<Controller>(
+                                    value: e,
+                                    child: Text(e.name),
+                                  ),
+                                )
+                                .toList();
+                          },
                         ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        color: const Color.fromARGB(255, 25, 71, 223),
-                        width: 100,
-                        height: 52,
-                        child: const Center(
-                          child: Text(
-                            "Container",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                        ),
-                      ),
-                    ),
+                      );
+                    },
                   )
                 ],
               ),
@@ -88,5 +83,34 @@ class Header extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class PopupMenuButtonShape extends StatelessWidget {
+  void Function()? onPressed;
+  PopupMenuButtonShape({
+    Key? key,
+    this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        width: 40,
+        height: 40,
+        // margin: const EdgeInsets.only(left: defaultPadding),
+
+        decoration: BoxDecoration(
+          color: AppColors.secondaryBg.withOpacity(0.5),
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: const Center(
+          child: Icon(Icons.menu, size: 40),
+        ),
+      ),
+    );
   }
 }

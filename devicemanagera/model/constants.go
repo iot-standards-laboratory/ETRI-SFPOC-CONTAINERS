@@ -6,6 +6,7 @@ var ConsulAddr = ""
 var MQTTAddr = ""
 var SvcId = ""
 var Origin = ""
+var ServerAddr = "localhost:3000"
 
 func PrintParam() {
 	fmt.Println("consul addr:", ConsulAddr)

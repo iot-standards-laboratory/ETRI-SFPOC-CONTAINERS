@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:front/app/model/config.dart';
+import 'package:front/app/model/controller.dart';
+import 'package:front/app/modules/home/controllers/http_loader.dart';
+import 'package:front/app/modules/home/controllers/mqtt_controller.dart';
 import 'package:front/constants.dart';
 import 'package:get/get.dart';
 
@@ -191,13 +196,55 @@ class HomeController extends GetxController {
     loadHistory();
   }
 
+  Config? config;
+  var ctrls = <Controller>[];
+  Controller? selectedCtrl;
+  MQTTController? _mqttController;
+
+  Future<void> load() async {
+    config = await loadConfig();
+    ctrls = config!.ctrls;
+    // if (selectedCtrl == null) {
+    //   updateSelectedCtrl(ctrls[0]);
+    // }
+
+    update(["reload"]);
+  }
+
+  void init() async {
+    await load();
+    if (_mqttController == null) {
+      _mqttController = MQTTController(
+        onUpdate: (topic, payload) {
+          print("topic: $topic\n payload: $payload");
+        },
+      );
+      var ok = await _mqttController!.connect(config!.serviceId);
+
+      if (selectedCtrl == null) {
+        updateSelectedCtrl(ctrls[0]);
+      }
+    }
+  }
+
+  void updateSelectedCtrl(Controller ctrl) {
+    selectedCtrl = ctrl;
+    _mqttController!.updateSubscribeChannel(topic: selectedCtrl!.reportChan);
+  }
+
+  void publishMessage() {}
+
   @override
   void onReady() {
     super.onReady();
+    init();
   }
 
   @override
   void onClose() {
     super.onClose();
+    if (_mqttController != null) {
+      _mqttController!.disconnect();
+    }
   }
 }

@@ -1,0 +1,43 @@
+GET http://localhost:3456/svc/5708653e-ef5a-4aad-83fb-ae1e8bbed65f/api/init
+Content-Type: "application/json"
+
+POST http://localhost:3000/api/v2/ctrls/213f3570-9226-4e8c-bdd3-816bc6eee9e1
+Content-Type: "application/json"
+
+{
+    "name": "etri-controller",
+    "id": "etri-controller-id#5",
+    "agent_id": "213f3570-9226-4e8c-bdd3-816bc6eee9e1",
+    "service_name": "devicemanagera",
+    "key": "etri-controller-key"
+}
+
+GET http://localhost:3000/api/v2/svcs
+Content-Type: "application/json"
+
+GET http://localhost:3000/api/v2/ctrls
+Content-Type: application/json
+service_name: devicemanagera
+
+GET http://localhost:3000/svc/1234
+Content-Type: "application/json"
+
+POST http://localhost:3000/api/v2/ctrls/213f3570-9226-4e8c-bdd3-816bc6eee9e1
+Content-Type: "application/json"
+
+{
+    "name": "etri-controller",
+    "id": "etri-controller-id#5",
+    "agent_id": "213f3570-9226-4e8c-bdd3-816bc6eee9e1",
+    "service_name": "devicemanagera",
+    "key": "etri-controller-key"
+}
+
+GET http://localhost:3000/api/v2/svcs
+Content-Type: "application/json"
+
+GET http://localhost:3000/api/v2/ctrls
+Content-Type: application/json
+service_name: devicemanagera
+
+GET http://localhost:3000/svc/1234

@@ -1,6 +1,8 @@
 package router
 
 import (
+	"devicemanagera/model"
+	"devicemanagera/model/cachestorage"
 	"net/http"
 	"strings"
 
@@ -12,10 +14,16 @@ import (
 func NewRouter(svcId string) *gin.Engine {
 	prefix := "/svc/" + svcId
 	apiEngine := gin.New()
+
 	api := apiEngine.Group(prefix + "/api/")
 	{
-		api.GET("/printHello", func(ctx *gin.Context) {
-			ctx.String(http.StatusOK, "Hello!!")
+		api.GET("/init", func(ctx *gin.Context) {
+			params := map[string]interface{}{
+				"mqtt_address": model.MQTTAddr,
+				"service_id":   model.SvcId,
+				"ctrls":        cachestorage.GetCtrls(),
+			}
+			ctx.JSON(http.StatusOK, params)
 		})
 	}
 

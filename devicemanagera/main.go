@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"devicemanagera/consul_api"
 	"devicemanagera/model"
+	"devicemanagera/model/cachestorage"
+	"devicemanagera/mqtthandler"
 	"devicemanagera/router"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,7 +18,7 @@ import (
 )
 
 func initService() {
-	req, err := http.NewRequest("PUT", "http://localhost:3000/api/v2/svcs", nil)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s/api/v2/svcs", model.ServerAddr), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +57,7 @@ func initService() {
 	if !ok {
 		panic(errors.New("invalid consul address error"))
 	}
-	mqttAddr, ok := connParam["consulAddr"]
+	mqttAddr, ok := connParam["mqttAddr"]
 	if !ok {
 		panic(errors.New("invalid mqtt address error"))
 	}
@@ -122,6 +125,7 @@ func connectConsul(svcId, consulAddr, originAddr string) error {
 
 func main() {
 	// init
+	flag.Parse()
 	initService()
 	makeIndex()
 	// model.PrintParam()
@@ -129,5 +133,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = mqtthandler.ConnectMQTT(model.MQTTAddr, model.SvcId)
+	if err != nil {
+		panic(err)
+	}
+	err = mqtthandler.Subscribe("public/statuschanged")
+	if err != nil {
+		panic(err)
+	}
+
+	cachestorage.QueryCtrls("devicemanagera")
 	router.NewRouter(model.SvcId).Run(":3456")
 }
