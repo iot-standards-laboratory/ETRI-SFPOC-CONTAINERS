@@ -4,10 +4,11 @@ import 'package:mqtt_client/mqtt_client.dart';
 
 class MQTTController {
   MqttBrowserClient? mqttClient;
+  String mqttAddr;
   String? latestTopic;
   Function(String topic, String payload) onUpdate;
-  MQTTController({required this.onUpdate}) {
-    mqttClient = newMqttClient(mqttAddr: "localhost");
+  MQTTController({required this.onUpdate, required this.mqttAddr}) {
+    mqttClient = newMqttClient(mqttAddr: mqttAddr);
 
     final connMess = MqttConnectMessage()
         // .withClientIdentifier('service')
@@ -38,6 +39,10 @@ class MQTTController {
     });
 
     return true;
+  }
+
+  void publish(String topic, MqttClientPayloadBuilder msg) {
+    mqttClient!.publishMessage(topic, MqttQos.atMostOnce, msg.payload!);
   }
 
   void addOnUpdate(Function(String topic, String payload) newOnUpdate) {

@@ -9,6 +9,7 @@ import 'package:front/app/modules/home/controllers/http_loader.dart';
 import 'package:front/app/modules/home/controllers/mqtt_controller.dart';
 import 'package:front/constants.dart';
 import 'package:get/get.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 
 enum NotifyEvent { history }
 
@@ -196,14 +197,17 @@ class HomeController extends GetxController {
     loadHistory();
   }
 
-  Config? config;
+  Config? svcConfig;
+
   var ctrls = <Controller>[];
   Controller? selectedCtrl;
-  MQTTController? _mqttController;
+  late MQTTController _mqttController;
+
+  void onUpdate(topic, payload) {}
 
   Future<void> load() async {
-    config = await loadConfig();
-    ctrls = config!.ctrls;
+    svcConfig = await loadConfig();
+    ctrls = svcConfig!.ctrls;
     // if (selectedCtrl == null) {
     //   updateSelectedCtrl(ctrls[0]);
     // }
@@ -212,27 +216,56 @@ class HomeController extends GetxController {
   }
 
   void init() async {
-    await load();
-    if (_mqttController == null) {
-      _mqttController = MQTTController(
-        onUpdate: (topic, payload) {
-          print("topic: $topic\n payload: $payload");
-        },
-      );
-      var ok = await _mqttController!.connect(config!.serviceId);
+    _mqttController = MQTTController(
+      mqttAddr: "mqtt.godopu.com",
+      onUpdate: (topic, payload) {
+        if (topic == svcConfig!.serviceId) {
+          load();
+        } else {
+          var obj = jsonDecode(payload);
+          temperature.value = obj['Temp'] ?? 0;
+          humidity.value = obj['Humidity'] ?? 0;
+          co2.value = obj['SoilHumi'] ?? 0;
 
-      if (selectedCtrl == null) {
-        updateSelectedCtrl(ctrls[0]);
-      }
+          if (isFirst) {
+            led.value = obj['lamp'] ?? false;
+            ventilationFan.value = obj['fan'] ?? false;
+            isFirst = false;
+          }
+        }
+      },
+    );
+
+    await load();
+    var ok = await _mqttController.connect(svcConfig!.serviceId);
+
+    if (selectedCtrl == null) {
+      updateSelectedCtrl(ctrls[0]);
     }
   }
 
   void updateSelectedCtrl(Controller ctrl) {
     selectedCtrl = ctrl;
-    _mqttController!.updateSubscribeChannel(topic: selectedCtrl!.reportChan);
+    _mqttController.updateSubscribeChannel(topic: selectedCtrl!.reportChan);
   }
 
-  void publishMessage() {}
+  var isFirst = true;
+
+  void publishMessage() {
+    var cmd = StringBuffer();
+
+    ventilationFan.value == true ? cmd.write('t') : cmd.write('f');
+    led.value == true ? cmd.write('t') : cmd.write('f');
+    cmd.write('f');
+    var ctrlMessage = <String, dynamic>{"code": 2, "cmd": cmd.toString()};
+
+    var s_ctrlMsg = jsonEncode(ctrlMessage);
+
+    var msgBuilder = MqttClientPayloadBuilder();
+    msgBuilder.addString(s_ctrlMsg);
+
+    _mqttController.publish(selectedCtrl!.controlChan, msgBuilder);
+  }
 
   @override
   void onReady() {
@@ -244,7 +277,7 @@ class HomeController extends GetxController {
   void onClose() {
     super.onClose();
     if (_mqttController != null) {
-      _mqttController!.disconnect();
+      _mqttController.disconnect();
     }
   }
 }

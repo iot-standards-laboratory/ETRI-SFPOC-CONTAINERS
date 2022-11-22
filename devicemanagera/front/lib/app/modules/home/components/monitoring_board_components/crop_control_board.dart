@@ -47,9 +47,13 @@ class CropControlBoard extends GetView<HomeController> {
                         onCheckBoxChanged: (b) {
                           ctrl.isLedAuto.value = b!;
                         },
-                        onStatusChanged: (b) {
-                          ctrl.led.value = b;
-                        },
+                        onStatusChanged: ctrl.isLedAuto.value
+                            ? null
+                            : (b) {
+                                if (ctrl.led.value == b) return;
+                                ctrl.led.value = b;
+                                ctrl.publishMessage();
+                              },
                       );
                     }),
                     GetX<HomeController>(builder: (ctrl) {
@@ -62,9 +66,13 @@ class CropControlBoard extends GetView<HomeController> {
                         onCheckBoxChanged: (b) {
                           ctrl.isVentilationFanAuto.value = b!;
                         },
-                        onStatusChanged: (b) {
-                          ctrl.ventilationFan.value = b;
-                        },
+                        onStatusChanged: ctrl.isLedAuto.value
+                            ? null
+                            : (b) {
+                                if (ctrl.ventilationFan.value == b) return;
+                                ctrl.ventilationFan.value = b;
+                                ctrl.publishMessage();
+                              },
                       );
                     }),
                     GetX<HomeController>(builder: (ctrl) {

@@ -50,10 +50,10 @@ class CropMonitoringBoard extends StatelessWidget {
             GetX<HomeController>(
               builder: (ctrl) {
                 return CropMonitoringComponent(
-                    label: "이산화탄소",
+                    label: "지습",
                     sublabel: "",
                     value: ctrl.co2.value,
-                    unit: "");
+                    unit: "%");
               },
             ),
           ],

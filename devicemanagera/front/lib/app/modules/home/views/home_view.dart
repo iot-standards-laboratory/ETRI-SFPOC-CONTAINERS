@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front/app/model/controller.dart';
 import 'package:front/app/modules/home/views/historical_monitoring_board.dart';
 import 'package:front/app/modules/home/views/monitoring_board.dart';
 
@@ -106,20 +107,17 @@ class HomeView extends GetView<HomeController> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: const Color.fromARGB(255, 25, 71, 223),
-                          ),
-                          width: 80,
-                          // height: 52,
-                          child: const Center(
-                            child: Text(
-                              "Container",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                          ),
+                        child: PopupMenuButton<Controller>(
+                          itemBuilder: (context) {
+                            return controller.ctrls
+                                .map(
+                                  (e) => PopupMenuItem<Controller>(
+                                    value: e,
+                                    child: Text(e.name),
+                                  ),
+                                )
+                                .toList();
+                          },
                         ),
                       ),
                     ],
