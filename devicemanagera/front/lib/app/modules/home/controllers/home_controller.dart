@@ -203,15 +203,22 @@ class HomeController extends GetxController {
   Controller? selectedCtrl;
   late MQTTController _mqttController;
 
-  void onUpdate(topic, payload) {}
-
   Future<void> load() async {
     svcConfig = await loadConfig();
     ctrls = svcConfig!.ctrls;
+
+    if (ctrls.isEmpty) {
+      _mqttController.unsubscribeChannel(topic: _mqttController.latestTopic);
+      temperature.value = 0;
+      humidity.value = 0;
+      co2.value = 0;
+      led.value = false;
+      ventilationFan.value = false;
+      selectedCtrl = null;
+    }
     // if (selectedCtrl == null) {
     //   updateSelectedCtrl(ctrls[0]);
     // }
-
     update(["reload"]);
   }
 
@@ -226,11 +233,9 @@ class HomeController extends GetxController {
           temperature.value = obj['Temp'] ?? 0;
           humidity.value = obj['Humidity'] ?? 0;
           co2.value = obj['SoilHumi'] ?? 0;
-
-          if (isFirst) {
+          if (!b_timeout) {
             led.value = obj['lamp'] ?? false;
             ventilationFan.value = obj['fan'] ?? false;
-            isFirst = false;
           }
         }
       },
@@ -239,17 +244,17 @@ class HomeController extends GetxController {
     await load();
     var ok = await _mqttController.connect(svcConfig!.serviceId);
 
-    if (selectedCtrl == null) {
+    if (selectedCtrl == null && ctrls.isNotEmpty) {
       updateSelectedCtrl(ctrls[0]);
     }
   }
+
+  var b_timeout = false;
 
   void updateSelectedCtrl(Controller ctrl) {
     selectedCtrl = ctrl;
     _mqttController.updateSubscribeChannel(topic: selectedCtrl!.reportChan);
   }
-
-  var isFirst = true;
 
   void publishMessage() {
     var cmd = StringBuffer();
@@ -259,12 +264,18 @@ class HomeController extends GetxController {
     cmd.write('f');
     var ctrlMessage = <String, dynamic>{"code": 2, "cmd": cmd.toString()};
 
-    var s_ctrlMsg = jsonEncode(ctrlMessage);
+    var sCtrlMsg = jsonEncode(ctrlMessage);
 
     var msgBuilder = MqttClientPayloadBuilder();
-    msgBuilder.addString(s_ctrlMsg);
+    msgBuilder.addString(sCtrlMsg);
 
-    _mqttController.publish(selectedCtrl!.controlChan, msgBuilder);
+    b_timeout = true;
+    Future.delayed(const Duration(seconds: 3), () {
+      b_timeout = false;
+    });
+    if (selectedCtrl != null) {
+      _mqttController.publish(selectedCtrl!.controlChan, msgBuilder);
+    }
   }
 
   @override

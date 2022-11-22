@@ -35,7 +35,7 @@ class MQTTController {
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       // print('');
 
-      onUpdate!(c[0].topic, pt);
+      onUpdate(c[0].topic, pt);
     });
 
     return true;
@@ -59,14 +59,14 @@ class MQTTController {
     }
 
     latestTopic = topic;
-    _subscribeChannel(topic: topic);
+    if (topic.isNotEmpty) _subscribeChannel(topic: topic);
   }
 
   void disconnect() {
     mqttClient!.disconnect();
   }
 
-  void unsubscribeChannel({required String topic}) {
-    mqttClient!.unsubscribe(topic);
+  void unsubscribeChannel({required String? topic}) {
+    if (topic != null) mqttClient!.unsubscribe(topic);
   }
 }

@@ -15,6 +15,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func initService() {
@@ -132,6 +134,11 @@ func main() {
 	err := connectConsul(model.SvcId, model.ConsulAddr, model.Origin)
 	if err != nil {
 		panic(err)
+	}
+	mqtthandler.MQTTHandler = func(client mqtt.Client, msg mqtt.Message) {
+		if strings.Compare(msg.Topic(), "public/statuschanged") == 0 {
+			cachestorage.QueryCtrls("devicemanagera")
+		}
 	}
 	err = mqtthandler.ConnectMQTT(model.MQTTAddr, model.SvcId)
 	if err != nil {

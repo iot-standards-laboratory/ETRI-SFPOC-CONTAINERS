@@ -1,10 +1,7 @@
 package mqtthandler
 
 import (
-	"devicemanagera/model"
-	"devicemanagera/model/cachestorage"
 	"fmt"
-	"strings"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -15,19 +12,20 @@ const passwd = "etrismartfarm"
 
 var client mqtt.Client
 
-var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	if strings.Compare(msg.Topic(), "public/statuschanged") == 0 {
-		cachestorage.QueryCtrls("devicemanagera")
-		Publish(model.SvcId, []byte("changed"))
-	}
-}
+// var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+// 	if strings.Compare(msg.Topic(), "public/statuschanged") == 0 {
+// 		cachestorage.QueryCtrls("devicemanagera")
+// 	}
+// }
+
+var MQTTHandler func(client mqtt.Client, msg mqtt.Message) = nil
 
 func ConnectMQTT(mqttAddr, id string) error {
 	opts := mqtt.NewClientOptions().AddBroker(mqttAddr).SetClientID(id)
 
 	opts.SetKeepAlive(60 * time.Second)
 	// Set the message callback handler
-	opts.SetDefaultPublishHandler(f)
+	opts.SetDefaultPublishHandler(MQTTHandler)
 	opts.SetPingTimeout(1 * time.Second)
 	opts.SetUsername(user)
 	opts.SetPassword(passwd)

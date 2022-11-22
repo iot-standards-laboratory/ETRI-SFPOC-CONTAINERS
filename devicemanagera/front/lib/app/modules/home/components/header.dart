@@ -62,6 +62,9 @@ class Header extends StatelessWidget {
                         width: 40,
                         height: 40,
                         child: PopupMenuButton<Controller>(
+                          onSelected: (value) {
+                            controller.updateSelectedCtrl(value);
+                          },
                           itemBuilder: (context) {
                             return controller.ctrls
                                 .map(

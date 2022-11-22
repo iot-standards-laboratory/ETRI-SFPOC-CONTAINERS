@@ -2,6 +2,7 @@ package cachestorage
 
 import (
 	"devicemanagera/model"
+	"devicemanagera/mqtthandler"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -59,5 +60,7 @@ func QueryCtrls(svcName string) error {
 		})
 	}
 
+	mqtthandler.Publish(model.SvcId, []byte("changed"))
+	fmt.Println(ctrls)
 	return nil
 }

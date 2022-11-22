@@ -78,75 +78,78 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, ctis) {
-      SizeConfig.init(context);
-      return Obx(() {
-        return SafeArea(
-          child: Scaffold(
-            key: controller.scaffoldKey,
-            drawer: const SizedBox(width: 100, child: SideMenu()),
-            appBar: !Responsive.isDesktop(context)
-                ? AppBar(
-                    elevation: 0,
-                    backgroundColor: AppColors.primaryBg,
-                    leading: IconButton(
-                      onPressed: () {
-                        controller.scaffoldKey.currentState!.openDrawer();
-                      },
-                      icon: const Icon(Icons.menu, color: AppColors.black),
-                    ),
-                    title: Text(
-                      "Smart Farm",
-                      style: GoogleFonts.sofia(
-                        fontSize: 24,
-                        color: Colors.grey[850],
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 8),
-                        child: PopupMenuButton<Controller>(
-                          itemBuilder: (context) {
-                            return controller.ctrls
-                                .map(
-                                  (e) => PopupMenuItem<Controller>(
-                                    value: e,
-                                    child: Text(e.name),
-                                  ),
-                                )
-                                .toList();
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : const PreferredSize(
-                    preferredSize: Size.zero,
-                    child: SizedBox(),
-                  ),
-            body: Row(
-              children: [
-                if (Responsive.isDesktop(context))
-                  const Expanded(
-                    flex: 1,
-                    child: SideMenu(),
-                  ),
-                Expanded(
-                  flex: 10,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Obx(
-                      () => renderBoard(controller.idx.value, context),
-                    ),
+    SizeConfig.init(context);
+    return SafeArea(
+      child: Scaffold(
+        key: controller.scaffoldKey,
+        drawer: const SizedBox(width: 100, child: SideMenu()),
+        appBar: !Responsive.isDesktop(context)
+            ? AppBar(
+                elevation: 0,
+                iconTheme: IconTheme.of(context).copyWith(color: Colors.black),
+                backgroundColor: AppColors.primaryBg,
+                leading: IconButton(
+                  onPressed: () {
+                    controller.scaffoldKey.currentState!.openDrawer();
+                  },
+                  icon: const Icon(Icons.menu, color: AppColors.black),
+                ),
+                title: Text(
+                  "Smart Farm",
+                  style: GoogleFonts.sofia(
+                    fontSize: 24,
+                    color: Colors.grey[850],
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-              ],
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: GetBuilder<HomeController>(
+                        id: "reload",
+                        builder: (controller) {
+                          return PopupMenuButton<Controller>(
+                            onSelected: (value) {
+                              controller.updateSelectedCtrl(value);
+                            },
+                            itemBuilder: (context) {
+                              return controller.ctrls
+                                  .map(
+                                    (e) => PopupMenuItem<Controller>(
+                                      value: e,
+                                      child: Text(e.name),
+                                    ),
+                                  )
+                                  .toList();
+                            },
+                          );
+                        }),
+                  ),
+                ],
+              )
+            : const PreferredSize(
+                preferredSize: Size.zero,
+                child: SizedBox(),
+              ),
+        body: Row(
+          children: [
+            if (Responsive.isDesktop(context))
+              const Expanded(
+                flex: 1,
+                child: SideMenu(),
+              ),
+            Expanded(
+              flex: 10,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Obx(
+                  () => renderBoard(controller.idx.value, context),
+                ),
+              ),
             ),
-          ),
-        );
-      });
-    });
+          ],
+        ),
+      ),
+    );
   }
 }
