@@ -158,7 +158,7 @@ void loop(){
     operate();
   }
 }
-
+ 
 
 void broadcastUUID()
 {
@@ -235,6 +235,7 @@ void operate() {
       break;
     }
   }
+  
   cmd[idx] = 0;
 
   if(!rcvCmd){

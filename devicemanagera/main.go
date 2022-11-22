@@ -2,58 +2,73 @@ package main
 
 import (
 	"bufio"
-	"devicemanagera/config"
+	"devicemanagera/model"
 	"devicemanagera/router"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
-func registerToEdge() {
-	req, err := http.NewRequest("PUT", "http://"+config.Params["serverAddr"].(string)+"/api/v1/svcs", nil)
+func initService() {
+	req, err := http.NewRequest("PUT", "http://localhost:3000/api/v2/svcs", nil)
 	if err != nil {
 		panic(err)
 	}
 
-	req.Header.Add("sname", config.Params["sname"].(string))
-	req.Header.Add("port", config.Params["bind"].(string))
+	req.Header.Add("name", "devicemanagera")
+	// req.Header.Add("port", config.Params["bind"].(string))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	payload := map[string]interface{}{}
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&payload)
 	if err != nil {
 		panic(err)
 	}
 
-	config.Set("sid", string(b))
+	connParam, ok := payload["conn_param"].(map[string]interface{})
+	if !ok {
+		panic(errors.New("invalid connection parameters error"))
+	}
+
+	info, ok := payload["info"].(map[string]interface{})
+	if !ok {
+		panic(errors.New("invalid service information error"))
+	}
+
+	origin, ok := payload["origin"].(string)
+	if !ok {
+		panic(errors.New("invalid origin address error"))
+	}
+
+	consulAddr, ok := connParam["consulAddr"]
+	if !ok {
+		panic(errors.New("invalid consul address error"))
+	}
+	mqttAddr, ok := connParam["consulAddr"]
+	if !ok {
+		panic(errors.New("invalid mqtt address error"))
+	}
+	svcId, ok := info["id"].(string)
+	if !ok {
+		panic(errors.New("invalid service id error"))
+	}
+
+	model.ConsulAddr = consulAddr.(string)
+	model.MQTTAddr = mqttAddr.(string)
+	model.Origin = origin
+	model.SvcId = svcId
 }
 
-func reconnectToEdge(sid string) {
-	req, err := http.NewRequest("PUT", "http://"+config.Params["serverAddr"].(string)+"/api/v1/svcs/"+sid, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	req.Header.Add("sname", config.Params["sname"].(string))
-	req.Header.Add("port", config.Params["bind"].(string))
-
-	_, err = http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-
-}
-
-func makeIndex(sid string) {
+func makeIndex() {
 	template, err := os.Open("./front/build/web/template.index.html")
 	if err != nil {
 		panic(err)
@@ -71,7 +86,7 @@ func makeIndex(sid string) {
 		if err != nil {
 			panic(err)
 		} else if strings.Contains(line, `<base href="/svc/{{serviceid}}/">`) {
-			fmt.Fprintf(index, `<base href="/svc/%s/">`, sid)
+			fmt.Fprintf(index, `<base href="/svc/%s/">`, model.SvcId)
 			break
 		} else {
 			fmt.Fprint(index, line)
@@ -85,31 +100,8 @@ func makeIndex(sid string) {
 }
 
 func main() {
-	if _, err := os.Stat("./config.properties"); errors.Is(err, os.ErrNotExist) {
-		// path/to/whatever does not exist
-		config.CreateInitFile()
-	}
-
-	config.LoadConfig()
-	// register
-	if strings.Compare(config.Params["sid"].(string), "blank") == 0 {
-		if strings.Compare(config.Params["mode"].(string), string(config.MANAGEDBYEDGE)) == 0 {
-			registerToEdge()
-		} else {
-			_uuid, err := uuid.NewUUID()
-			if err != nil {
-				panic(err)
-			}
-			config.Set("sid", _uuid.String())
-		}
-
-		// make index file
-		makeIndex(config.Params["sid"].(string))
-	} else {
-		if strings.Compare(config.Params["mode"].(string), string(config.MANAGEDBYEDGE)) == 0 {
-			reconnectToEdge(config.Params["sid"].(string))
-		}
-	}
-
-	router.NewRouter(config.Params["sid"].(string)).Run(config.Params["bind"].(string))
+	// init
+	initService()
+	model.PrintParam()
+	router.NewRouter(model.SvcId).Run(":3579")
 }

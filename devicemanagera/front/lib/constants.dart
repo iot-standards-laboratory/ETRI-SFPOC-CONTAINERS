@@ -1,3 +1,15 @@
-var publishUrl = '${Uri.base.path}push/v1';
-var apiUrl = '${Uri.base.path}api/v1';
-var serverAddr = '${Uri.base.host}:${Uri.base.port}';
+import 'package:flutter/material.dart';
+
+late String serverAddr;
+
+const List<Color> kDefaultRainbowColors = [
+  Colors.deepPurple,
+  Colors.deepPurple,
+  Colors.deepPurple,
+  Colors.green,
+  Colors.blue,
+  Colors.indigo,
+  Colors.purple,
+];
+
+var isLogin = false;

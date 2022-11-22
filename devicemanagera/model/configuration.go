@@ -13,12 +13,12 @@ type Device struct {
 	// Opts []string
 }
 
-type Controller struct {
-	gorm.Model
-	CID   string `gorm:"uniqueIndex;column:cid" json:"cid"` // Controller ID
-	CName string `gorm:"column:ename" json:"cname"`         // Device ID
-	Key   string `gorm:"column:key" json:"key"`             // Service ID
-}
+// type Controller struct {
+// 	gorm.Model
+// 	CID   string `gorm:"uniqueIndex;column:cid" json:"cid"` // Controller ID
+// 	CName string `gorm:"column:ename" json:"cname"`         // Device ID
+// 	Key   string `gorm:"column:key" json:"key"`             // Service ID
+// }
 
 type Service struct {
 	gorm.Model

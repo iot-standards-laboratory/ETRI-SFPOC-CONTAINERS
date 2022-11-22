@@ -1,8 +1,8 @@
-@sid = 6a9029a8-0392-4dcf-87a0-08fcba82d088
+@sid = 4aec1528-42f2-4d09-b736-e2e3bd06803f
 
 @did = 8f63ba8b-a4e9-4325-89d9-8d60f8ba47eD
 @cid = 718b558a-7112-458a-8028-6899fc1c12e4
-@mid = 6ed492ec-caa0-11ec-9040-0242ac110002
+@mid = 8309a610-cb4d-11ec-9451-0242ac110003
 
 @serverAddr = dsad:3000
 POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
@@ -48,10 +48,9 @@ POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
 
 {
     "did": "{{did}}",
-    "cid": "{{cid}}",
     "status": {
         "fan": false,
-        "lamp": false
+        "lamp": true
     }
 }
 
