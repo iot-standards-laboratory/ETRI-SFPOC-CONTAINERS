@@ -5,23 +5,23 @@ RUN apk update && \
 RUN mkdir /home/build
 COPY . /home/build
 WORKDIR /home/build
-RUN go mod tidy && go build -o devicemanager
+RUN go mod tidy && go build -o app
 
 FROM alpine:latest
 ARG PUID=2000
 ARG PGID=2000
 
 # Run App
-RUN addgroup -g ${PGID} devicemanager && \
-    adduser -H -D -u ${PUID} -G devicemanager devicemanager
+RUN addgroup -g ${PGID} devicemanagera && \
+    adduser -H -D -u ${PUID} -G devicemanagera devicemanagera
 
 WORKDIR /home/build
 
-COPY --from=gobuild /home/build/devicemanager devicemanager
+COPY --from=gobuild /home/build/app app
 COPY --from=gobuild /home/build/front front
 
 RUN chown -R ${PUID}:${PGID} /home/build
 
-USER devicemanager
+USER devicemanagera
 ENV mode=managedbyedge
-CMD ["/home/build/devicemanager"]
+CMD ["/home/build/app"]

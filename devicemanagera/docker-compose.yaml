@@ -1,10 +1,12 @@
 version: '3.3'
 
 services:
-  
+
   devicemanagera:
     build: .
-    image: devicemanagera
+    image: devicemanagera:latest
     hostname: devicemanagera
+    container_name: devicemanagera
+    restart: always
     environment:
       - "mode=managedbyedge"

@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -19,7 +20,17 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+func getIP() string {
+	host, _ := os.Hostname()
+	addrs, _ := net.LookupIP(host)
+
+	return addrs[0].String()
+}
+
 func initService() {
+	myIP := getIP()
+	idx := strings.LastIndex(myIP, ".")
+	model.ServerAddr = myIP[:idx+1] + "1:3000"
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s/api/v2/svcs", model.ServerAddr), nil)
 	if err != nil {
 		panic(err)

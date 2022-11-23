@@ -18,6 +18,8 @@ func NewRouter(svcId string) *gin.Engine {
 	api := apiEngine.Group(prefix + "/api/")
 	{
 		api.GET("/init", func(ctx *gin.Context) {
+			ctx.Writer.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+			ctx.Writer.Header().Set("Pragma", "no-cache")
 			params := map[string]interface{}{
 				"mqtt_address": model.MQTTAddr,
 				"service_id":   model.SvcId,
