@@ -4,8 +4,8 @@
 
 #include <DHT_U.h>
 // #include <VitconBrokerComm.h>
-#include <SoftPWM.h>
 #include <ArduinoJson.h>
+#include <SoftPWM.h>
 #include <U8g2lib.h>  //U8g2 by oliver 라이브러리 설치 필요
 U8G2_SH1106_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 
@@ -17,77 +17,28 @@ U8G2_SH1106_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 #define SOILHUMI A6
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
-SOFTPWM_DEFINE_CHANNEL(A3);  //Arduino pin A3
+SOFTPWM_DEFINE_CHANNEL(A3);  // Arduino pin A3
 
 int Soilhumi = 0;
 float Temp = 0;
 float Humi = 0;
 int fanVal = 0;
 
-// mode = 0 -> initial mode
-// mode = 1 -> operating mode
 int mode = 0;
-
-bool timeset = false;
-bool soilstatus = true;
-bool tempstatus = false;
-bool lampflag = true;
-bool auto_1_execute = false;
-bool manu_1_execute = false;
 
 bool fan_out_status;
 bool pump_out_status;
 bool lamp_out_status;
-bool Interval_Minute_Up_status;
-bool Interval_Hour_Up_status;
 
-
-
-uint32_t Hour = 0;
-uint32_t Minute = 1;
-uint32_t TimeSum = 0;
-uint32_t TimeStatus;
+uint8_t controlMessage[100];
+int controlMessageLength = 0;
+uint8_t latestControlMessageToken = 0;
+uint8_t processedControlMessageToken = 0;
+uint8_t controlMessageSequence = 0;
+uint8_t processedControlMessageSequence = 0;
 
 /* A set of definition for IOT items */
 #define ITEM_COUNT 18
-
-//Interval 설정 모드로 들어가기 위한 함수
-void timeset_out(bool val) {
-  timeset = val;
-}
-
-//Interval 시간 단위를 설정하는 함수
-void Interval_Hup(bool val) {
-  Interval_Hour_Up_status = val;
-}
-
-//Interval 분 단위를 설정하는 함수
-void Interval_Mup(bool val) {
-  Interval_Minute_Up_status = val;
-}
-
-//manual mode일 때 FAN을 제어하는 함수
-void fan_out(bool val) {
-  fan_out_status = val;
-}
-
-//manual mode일 때 PUMP를 제어하는 함수
-void pump_out(bool val) {
-  pump_out_status = val;
-}
-
-//manual mode일 때 LAMP를 제어하는 함수
-void lamp_out(bool val) {
-  lamp_out_status = val;
-}
-
-//Interval을 0시 0분으로 리셋하는 함수
-void IntervalReset(bool val) {
-  if (!timeset && val) {
-    Hour = 0;
-    Minute = 0;
-  }
-}
 
 void drawLogo() {
   u8g2.clearBuffer();
@@ -113,167 +64,109 @@ void drawLogo() {
 
   u8g2.sendBuffer();
 }
-StaticJsonDocument<1000>  makeStatusJson();
-StaticJsonDocument<1000>  makeAckJson(char* tkn);
+StaticJsonDocument<1000> makeStatusJson();
+StaticJsonDocument<1000> makeAckJson(char *tkn);
 
 StaticJsonDocument<100> INFO;
 String sname = "devicemanagera";
-String uuid = "DEVICE-A-UUID";
+String uuid = "etri-ZXRyaQ==";
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   //   comm.SetInterval(200);
 
   mode = 0;
 
   INFO["uuid"] = uuid;
   INFO["sname"] = sname;
-  INFO["code"] = 0;
 
   pinMode(LAMP, OUTPUT);
   pinMode(PUMP, OUTPUT);
   pinMode(SOILHUMI, INPUT);
 
-  //초기설정
+  // 초기설정
   digitalWrite(LAMP, LOW);
   digitalWrite(PUMP, LOW);
 
   u8g2.begin();
   dht.begin();
 
-  
   // begin with 60hz pwm frequency
   SoftPWM.begin(490);
 }
 
-char latestToken[9] = "Temporary"; 
+bool readControlMessage() {
+  uint8_t recvValue = 0;
 
-void operate();
-void initialize();
+  controlMessageLength = 0;
 
-void loop(){
-  if(mode == 0){
-    initialize();
-  }else{
-    operate();
-  }
-}
- 
-
-void broadcastUUID()
-{
-    serializeJson(INFO, Serial);
-    Serial.println();
-
-}
-
-void initialize(){
-  bool rcvCmd = false;
-  char cmd[200];
-  int idx = 0;
-
-  rcvCmd = Serial.available();
-  while(Serial.available()){
-    char ch = Serial.read();
-    cmd[idx] = ch;
-    idx = idx+1;
-    if(ch == '\n'){
+  while (true) {
+    recvValue = Serial.read();
+    if (recvValue == 255) {
       break;
     }
-  }
-  cmd[idx] = 0;
 
-  if(!rcvCmd){
-    broadcastUUID();
-  }else{
-    // when retrieve command msg
-    // deserialize json
-    StaticJsonDocument<1000> cmdJson;
-    
-    DeserializationError err = deserializeJson(cmdJson, cmd);
-    if(!err && cmdJson["token"] != NULL){
-      mode = cmdJson["mode"];
-      serializeJson(makeAckJson(cmdJson["token"]), Serial);
-    }else{
-      Serial.print(cmd);
-      Serial.println();
-      // Serial.print("{\"code\": 400}");
-    }
+    controlMessage[controlMessageLength] = recvValue;
+    controlMessageLength++;
   }
 
-  rcvCmd = false;
-  idx = 0;
-  delay(2000);
+  if (controlMessage[2] != controlMessageLength) {
+    return false;
+  }
+
+  if (controlMessageLength < 3) {
+    return false;
+  }
+
+  latestControlMessageToken = controlMessage[1];
+  controlMessageSequence = (controlMessageSequence + 1) % 256;
+  return true;
 }
 
-void operate() {
-  bool rcvCmd = false;
-  char cmd[1000];
-  int idx = 0;
-
-  /* DHT22 data acquisition */
-  sensors_event_t event1;
-  sensors_event_t event2;
-
-  dht.temperature().getEvent(&event1);  //DHT22_Temperature
-  Temp = event1.temperature;
-
-  dht.humidity().getEvent(&event2);  //DHT22_Humidity
-  Humi = event2.relative_humidity;
-
-  Soilhumi = map(analogRead(SOILHUMI), 0, 1023, 100, 0);  //soil humiditiy
-
-  drawLogo();
-
-  rcvCmd = Serial.available();
-  
-  while(Serial.available()){
-    char ch = Serial.read();
-    cmd[idx] = ch;
-    idx = idx+1;
-    if(ch == '\n'){
-      break;
-    }
+void processControlMessage() {
+  if (processedControlMessageToken == latestControlMessageToken) {
+    processedControlMessageSequence = controlMessageSequence;
+    sendMessage(200);
+    return;
   }
-  
-  cmd[idx] = 0;
 
-  if(!rcvCmd){
+  // code check
+  if (controlMessage[0] == 11 && mode == 0) {
+    // process init control message
+    mode = 1;
+  } else if (controlMessage[0] == 10 && mode == 1) {
+    mode = 0;
+  } else if (controlMessage[0] == 2 && mode == 1) {
+    fan_out_status = controlMessage[3] == 't';
+    lamp_out_status = controlMessage[4] == 't';
+    pump_out_status = controlMessage[5] == 'f';
+
+    if (fan_out_status) {
+      SoftPWM.set(65);
+    } else {
+      SoftPWM.set(0);
+    }
+    digitalWrite(LAMP, lamp_out_status);
+  }
+
+  processedControlMessageSequence = controlMessageSequence;
+  processedControlMessageToken = latestControlMessageToken;
+  sendMessage(200);
+}
+
+void sendMessage(uint8_t code) {
+  Serial.write(code);
+  if (code == 200) {
+    Serial.write(processedControlMessageToken);
+  } else {
     serializeJson(makeStatusJson(), Serial);
-    Serial.println();
-  }else{
-    // when retrieve command msg
-    // deserialize json
-    StaticJsonDocument<1000> cmdJson;
-    
-    DeserializationError err = deserializeJson(cmdJson, cmd);
-    if(!err){
-      if(cmdJson["code"] == 255) {
-        mode = 0;
-        return;
-      }else if(cmdJson["code"] == 1){
-        serializeJson(makeAckJson(cmdJson["token"]), Serial);
-        lamp_out_status = cmdJson["body"]["lamp"];
-        fan_out_status = cmdJson["body"]["fan"];
-        ManualMode();
-      }
-      
-    }else{
-      Serial.print("{\"code\": 400}");
-    }
-    // send ack message
-    
-    Serial.println();
   }
-  
-  rcvCmd = false;
-  idx = 0;
-  SoftPWM.set(fanVal);
-  delay(500);
+
+  Serial.write(255);
 }
 
-StaticJsonDocument<1000>  makeStatusJson(){
-  // return status report message 
+StaticJsonDocument<1000> makeStatusJson() {
+  // return status report message
   StaticJsonDocument<1000> body;
   body["Temp"] = Temp;
   body["Humidity"] = Humi;
@@ -284,24 +177,52 @@ StaticJsonDocument<1000>  makeStatusJson(){
   StaticJsonDocument<1000> msg;
   msg["code"] = 1;
   msg["body"] = body;
-  
+
   return msg;
 }
 
-StaticJsonDocument<1000>  makeAckJson(char* tkn){
-  // return ack message 
-  StaticJsonDocument<1000> doc;
-  doc["code"] = 2;
-  doc["token"] = tkn;
-  return doc;
+
+void broadcastUUID() {
+  Serial.write(199);
+  serializeJson(INFO, Serial);
+  Serial.write(255);
 }
 
-void ManualMode() {
-  if (fan_out_status == true) {
-    fanVal = 65;
-  } else {
-    fanVal = 0;
+void operate() {
+  char cmd[1000];
+  int idx = 0;
+
+  /* DHT22 data acquisition */
+  sensors_event_t event1;
+  sensors_event_t event2;
+
+  dht.temperature().getEvent(&event1);  // DHT22_Temperature
+  Temp = event1.temperature;
+
+  dht.humidity().getEvent(&event2);  // DHT22_Humidity
+  Humi = event2.relative_humidity;
+
+  Soilhumi = map(analogRead(SOILHUMI), 0, 1023, 100, 0);  // soil humiditiy
+
+  drawLogo();
+  sendMessage(201);
+}
+
+void loop() {
+  if (Serial.available()) {
+    readControlMessage();
   }
-  digitalWrite(PUMP, pump_out_status);
-  digitalWrite(LAMP, lamp_out_status);
+
+  if (controlMessageSequence != processedControlMessageSequence) {
+    processControlMessage();
+    return;
+  }
+
+  if (mode == 0) {
+    broadcastUUID();
+  } else {
+    operate();
+  }
+
+  delay(1000);
 }
