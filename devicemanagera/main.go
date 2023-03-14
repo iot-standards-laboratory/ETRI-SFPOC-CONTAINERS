@@ -151,7 +151,7 @@ func main() {
 			cachestorage.QueryCtrls("devicemanagera")
 		}
 	}
-	err = mqtthandler.ConnectMQTT(model.MQTTAddr, model.SvcId)
+	err = mqtthandler.ConnectMQTT("wss://mqtt.godopu.com", model.SvcId)
 	if err != nil {
 		panic(err)
 	}
