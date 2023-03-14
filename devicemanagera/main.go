@@ -28,9 +28,16 @@ func getIP() string {
 }
 
 func initService() {
-	myIP := getIP()
-	idx := strings.LastIndex(myIP, ".")
-	model.ServerAddr = myIP[:idx+1] + "1:3000"
+	{
+		myIP := getIP()
+		idx := strings.LastIndex(myIP, ".")
+		model.ServerAddr = myIP[:idx+1] + "1:3000"
+	}
+	// for test
+	// {
+	// 	model.ServerAddr = "192.168.0.9:3000" // for test
+	// }
+
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s/api/v2/svcs", model.ServerAddr), nil)
 	if err != nil {
 		panic(err)
@@ -86,12 +93,12 @@ func initService() {
 }
 
 func makeIndex() {
-	template, err := os.Open("./front/build/web/template.index.html")
+	template, err := os.Open("./template.index.html")
 	if err != nil {
 		panic(err)
 	}
 	defer template.Close()
-	index, err := os.Create("./front/build/web/index.html")
+	index, err := os.Create("./front/index.html")
 	if err != nil {
 		panic(err)
 	}
@@ -160,6 +167,10 @@ func main() {
 		panic(err)
 	}
 
-	cachestorage.QueryCtrls("devicemanagera")
+	err = cachestorage.QueryCtrls("devicemanagera")
+	if err != nil {
+		panic(err)
+	}
+
 	router.NewRouter(model.SvcId).Run(":3456")
 }

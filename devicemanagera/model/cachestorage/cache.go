@@ -33,7 +33,6 @@ func QueryCtrls(svcName string) error {
 
 	dec := json.NewDecoder(resp.Body)
 	m_ctrls := []map[string]interface{}{}
-
 	err = dec.Decode(&m_ctrls)
 	if err != nil {
 		return err
@@ -55,8 +54,8 @@ func QueryCtrls(svcName string) error {
 		}
 		ctrls = append(ctrls, &model.Controller{
 			Name:        name,
-			ReportChan:  key,
-			ControlChan: key + "c",
+			ReportChan:  key + "/content",
+			ControlChan: key,
 		})
 	}
 
