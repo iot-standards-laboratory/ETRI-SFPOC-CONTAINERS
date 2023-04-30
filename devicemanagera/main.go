@@ -33,6 +33,7 @@ func initService() {
 		idx := strings.LastIndex(myIP, ".")
 		model.ServerAddr = myIP[:idx+1] + "1:3000"
 	}
+
 	// for test
 	// {
 	// 	model.ServerAddr = "192.168.0.9:3000" // for test
@@ -93,12 +94,12 @@ func initService() {
 }
 
 func makeIndex() {
-	template, err := os.Open("./template.index.html")
+	template, err := os.Open("./www/template.index.html")
 	if err != nil {
 		panic(err)
 	}
 	defer template.Close()
-	index, err := os.Create("./front/index.html")
+	index, err := os.Create("./www/web/index.html")
 	if err != nil {
 		panic(err)
 	}

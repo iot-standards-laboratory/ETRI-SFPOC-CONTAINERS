@@ -18,7 +18,7 @@ RUN addgroup -g ${PGID} devicemanagera && \
 WORKDIR /home/build
 
 COPY --from=gobuild /home/build/app app
-COPY --from=gobuild /home/build/front front
+COPY --from=gobuild /home/build/www www
 
 RUN chown -R ${PUID}:${PGID} /home/build
 
