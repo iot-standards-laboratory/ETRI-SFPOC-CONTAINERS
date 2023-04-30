@@ -2,11 +2,6 @@ package main
 
 import (
 	"bufio"
-	"devicemanagera/consul_api"
-	"devicemanagera/model"
-	"devicemanagera/model/cachestorage"
-	"devicemanagera/mqtthandler"
-	"devicemanagera/router"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -15,6 +10,11 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"sgsvca/consul_api"
+	"sgsvca/model"
+	"sgsvca/model/cachestorage"
+	"sgsvca/mqtthandler"
+	"sgsvca/router"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"

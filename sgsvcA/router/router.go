@@ -1,9 +1,9 @@
 package router
 
 import (
-	"devicemanagera/model"
-	"devicemanagera/model/cachestorage"
 	"net/http"
+	"sgsvca/model"
+	"sgsvca/model/cachestorage"
 	"strings"
 
 	"github.com/gin-gonic/gin"

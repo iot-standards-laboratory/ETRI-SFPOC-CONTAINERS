@@ -237,6 +237,8 @@ class HomeController extends GetxController {
           } else if (topic.endsWith("/actuator")) {
             led.value = obj['led'] ?? led.value;
             ventilationFan.value = obj['fan'] ?? ventilationFan.value;
+            irrigationSystem[0].value =
+                obj['pump'] ?? irrigationSystem[0].value;
           }
         }
       },

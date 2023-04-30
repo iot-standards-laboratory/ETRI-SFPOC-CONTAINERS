@@ -1,8 +1,8 @@
 package router
 
 import (
-	"devicemanagera/model"
 	"net/http"
+	"sgsvca/model"
 
 	"github.com/gin-gonic/gin"
 )

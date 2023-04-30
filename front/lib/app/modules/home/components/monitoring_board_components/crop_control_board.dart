@@ -141,17 +141,22 @@ class CropControlBoard extends GetView<HomeController> {
                             return Obx(() {
                               return CropControlComponent(
                                 label: '${idx + 1}단',
-                                status: controller.irrigationSystem[idx].value,
-                                isAuto: controller
-                                    .isIrrigationSystemAuto[idx].value,
+                                status: controller.irrigationSystem[0].value,
+                                isAuto:
+                                    controller.isIrrigationSystemAuto[0].value,
                                 width: 220,
                                 backgroundColor: AppColors.white,
                                 onCheckBoxChanged: (b) {
-                                  controller.isIrrigationSystemAuto[idx].value =
+                                  controller.isIrrigationSystemAuto[0].value =
                                       b!;
                                 },
                                 onStatusChanged: (b) {
-                                  controller.irrigationSystem[idx].value = b;
+                                  if (controller.irrigationSystem[0].value ==
+                                      b) {
+                                    return;
+                                  }
+                                  // ctrl.ventilationFan.value = b;
+                                  controller.publishMessage('pump', b);
                                 },
                               );
                             });
