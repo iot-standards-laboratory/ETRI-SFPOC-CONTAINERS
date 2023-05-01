@@ -32,6 +32,7 @@ func initService() {
 		myIP := getIP()
 		idx := strings.LastIndex(myIP, ".")
 		model.ServerAddr = myIP[:idx+1] + "1:3000"
+		// model.ServerAddr = "localhost:3000"
 	}
 
 	// for test
@@ -44,7 +45,7 @@ func initService() {
 		panic(err)
 	}
 
-	req.Header.Add("name", "devicemanagera")
+	req.Header.Add("id", "sgsvc_a")
 	// req.Header.Add("port", config.Params["bind"].(string))
 
 	resp, err := http.DefaultClient.Do(req)
@@ -82,7 +83,7 @@ func initService() {
 	if !ok {
 		panic(errors.New("invalid mqtt address error"))
 	}
-	svcId, ok := info["id"].(string)
+	containerId, ok := info["cid"].(string)
 	if !ok {
 		panic(errors.New("invalid service id error"))
 	}
@@ -90,7 +91,7 @@ func initService() {
 	model.ConsulAddr = consulAddr.(string)
 	model.MQTTAddr = mqttAddr.(string)
 	model.Origin = origin
-	model.SvcId = svcId
+	model.SvcId = containerId
 }
 
 func makeIndex() {
@@ -99,7 +100,7 @@ func makeIndex() {
 		panic(err)
 	}
 	defer template.Close()
-	index, err := os.Create("./www/web/index.html")
+	index, err := os.Create("./www/index.html")
 	if err != nil {
 		panic(err)
 	}
@@ -156,7 +157,7 @@ func main() {
 	}
 	mqtthandler.MQTTHandler = func(client mqtt.Client, msg mqtt.Message) {
 		if strings.Compare(msg.Topic(), "public/statuschanged") == 0 {
-			cachestorage.QueryCtrls("devicemanagera")
+			cachestorage.QueryCtrls("sgsvc_a")
 		}
 	}
 	err = mqtthandler.ConnectMQTT("wss://mqtt.godopu.com", model.SvcId)
@@ -168,7 +169,7 @@ func main() {
 		panic(err)
 	}
 
-	err = cachestorage.QueryCtrls("devicemanagera")
+	err = cachestorage.QueryCtrls("sgsvc_a")
 	if err != nil {
 		panic(err)
 	}

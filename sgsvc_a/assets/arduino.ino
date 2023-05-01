@@ -26,20 +26,21 @@ SOFTPWM_DEFINE_CHANNEL(A3); // Arduino pin A3
 
 const char *firmware_version = "v0.3";
 const String sname = "SG-Service (Type A)";
-const String uuid = "etri-KYxUyaQ==";
+const String sid = "sgsvc_a";
+const String uuid = "etri-KYxUyaQ1=";
 const long interval = 2000;
 
 typedef struct _sensor {
   float temp;
   float humi;
   float soilHumi;
-} Sensor;
+}Sensor;
 
 typedef struct _actuator {
-  bool led;
+  bool led; 
   bool fan;
   bool pump;
-} Actuator;
+}Actuator; 
 
 byte requestMessage[100];
 int requestMessageLength = 0;
@@ -81,6 +82,7 @@ void setup() {
 
   INFO["uuid"] = uuid;
   INFO["sname"] = sname;
+  INFO["sid"] = sid;
 
   pinMode(LAMP, OUTPUT);
   pinMode(PUMP, OUTPUT);
@@ -112,10 +114,11 @@ bool readRequestMessage() {
     requestMessageLength++;
   }
 
+  
   requestMessage[requestMessageLength] = 0;
 
   // error handling
-  if (requestMessageLength == 0) {
+  if(requestMessageLength == 0){
     return false;
   }
 
@@ -132,17 +135,17 @@ bool readRequestMessage() {
 
 void handleQueryMessage() {
   uint8_t tkn = (uint8_t)requestMessage[1];
-  String query = String((char *)(requestMessage + 3));
+  String query = String((char*)(requestMessage + 3));
 
-  if (query == "init") {
+  if(query == "init"){
     sendMessageWithJson(205, tkn, INFO);
-  } else if (query == "sensor") {
+  }else if(query == "sensor"){
     StaticJsonDocument<100> js_sensor;
     js_sensor["temp"] = sensor.temp;
     js_sensor["humi"] = sensor.humi;
     js_sensor["soilHumi"] = sensor.soilHumi;
     sendMessageWithJson(205, tkn, js_sensor);
-  } else if (query == "actuator") {
+  }else if(query == "actuator"){
     StaticJsonDocument<100> js_actuator;
     js_actuator["led"] = actuator.led;
     js_actuator["fan"] = actuator.fan;
@@ -169,27 +172,29 @@ void handleControlMessage() {
     }
 
     actuatorToSync.led = doc["value"];
-  } else if (strcmp("fan", doc["path"]) == 0) {
+  }else if (strcmp("fan", doc["path"]) == 0) {
     if (doc["value"] != true && doc["value"] != false) {
       sendMessageWithString(404, requestMessage[1], "invalid value error");
       return;
     }
 
     actuatorToSync.fan = doc["value"];
-  } else if (strcmp("pump", doc["path"]) == 0) {
+  }else if (strcmp("pump", doc["path"]) == 0) {
     if (doc["value"] != true && doc["value"] != false) {
       sendMessageWithString(404, requestMessage[1], "invalid value error");
       return;
     }
 
     actuatorToSync.pump = doc["value"];
-  } else {
+  }else{
     sendMessageWithString(404, requestMessage[1], "invalid path error");
-    return;
+    return ;
   }
 
   sendMessageWithString(204, requestMessage[1], "changed");
 }
+
+
 
 void handleRequestMessage() {
   // code check
@@ -206,15 +211,14 @@ void handleRequestMessage() {
   }
 }
 
-void sendMessageWithJson(uint8_t code, uint8_t token,
-                         JsonVariantConst payload) {
+void sendMessageWithJson(uint8_t code, uint8_t token, JsonVariantConst payload) {
   Serial.write(code);
   Serial.write(token);
   serializeJson(payload, Serial);
   Serial.write(255);
 }
 
-void sendMessageWithString(uint8_t code, uint8_t token, char *payload) {
+void sendMessageWithString(uint8_t code, uint8_t token, char* payload) {
   Serial.write(code);
   Serial.write(token);
   Serial.write(payload);
@@ -227,12 +231,12 @@ void syncActuatorStatus() {
     digitalWrite(LAMP, actuator.led);
   }
 
-  if (actuator.fan != actuatorToSync.fan) {
+  if(actuator.fan != actuatorToSync.fan){
     actuator.fan = actuatorToSync.fan;
     SoftPWM.set(actuator.fan ? 65 : 0);
   }
 
-  if (actuator.pump != actuatorToSync.pump) {
+  if(actuator.pump != actuatorToSync.pump){
     actuator.pump = actuatorToSync.pump;
     digitalWrite(PUMP, actuator.pump);
   }
@@ -249,8 +253,7 @@ void sensing() {
   dht.humidity().getEvent(&event2); // DHT22_Humidity
   sensor.humi = event2.relative_humidity;
 
-  sensor.soilHumi =
-      map(analogRead(SOILHUMI), 0, 1023, 100, 0); // soil humiditiy
+  sensor.soilHumi = map(analogRead(SOILHUMI), 0, 1023, 100, 0); // soil humiditiy
 
   drawLogo();
 }
@@ -263,7 +266,7 @@ void loop() {
     sensing();
   }
 
-  if (readRequestMessage()) {
+  if(readRequestMessage()){
     handleRequestMessage();
   }
 

@@ -30,7 +30,7 @@ func NewRouter(svcId string) *gin.Engine {
 	}
 
 	assetEngine := gin.New()
-	assetEngine.Static(prefix, "./www/web")
+	assetEngine.Static(prefix, "./www")
 	// assetEngine.Static(prefix, "./static")
 
 	r := gin.New()
