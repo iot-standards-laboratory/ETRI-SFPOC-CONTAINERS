@@ -18,13 +18,13 @@ func GetCtrls() []*model.Controller {
 	return ctrls
 }
 
-func QueryCtrls(svcName string) error {
+func QueryCtrls(id string) error {
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s/api/v2/ctrls", model.ServerAddr), nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("service_name", svcName)
+	req.Header.Add("id", id)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

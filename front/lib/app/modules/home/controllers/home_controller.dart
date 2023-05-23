@@ -7,7 +7,6 @@ import 'package:front/app/model/config.dart';
 import 'package:front/app/model/controller.dart';
 import 'package:front/app/modules/home/controllers/http_loader.dart';
 import 'package:front/app/modules/home/controllers/mqtt_controller.dart';
-import 'package:front/constants.dart';
 import 'package:get/get.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
@@ -223,8 +222,14 @@ class HomeController extends GetxController {
   }
 
   void init() async {
+    await load();
+
+    if (svcConfig == null) {
+      return;
+    }
+
     _mqttController = MQTTController(
-      mqttAddr: "mqtt.godopu.com",
+      mqttAddr: svcConfig!.mqttAddress,
       onUpdate: (topic, payload) {
         if (topic == svcConfig!.serviceId) {
           load();
@@ -244,7 +249,6 @@ class HomeController extends GetxController {
       },
     );
 
-    await load();
     var ok = await _mqttController.connect(svcConfig!.serviceId);
 
     if (selectedCtrl == null && ctrls.isNotEmpty) {

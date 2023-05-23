@@ -1,14 +1,17 @@
-import 'dart:async';
 import 'package:mqtt_client/mqtt_browser_client.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
-MqttBrowserClient newMqttClient({required String mqttAddr}) {
+MqttBrowserClient newMqttClient({
+  required String scheme,
+  required String host,
+  required int port,
+}) {
   var client =
-      MqttBrowserClient('wss://$mqttAddr', '', maxConnectionAttempts: 5);
+      MqttBrowserClient('$scheme://$host', '', maxConnectionAttempts: 5);
   client.logging(on: false);
   client.setProtocolV311();
   client.connectTimeoutPeriod = 10000;
-  client.port = 443;
+  client.port = port;
   client.onDisconnected = onDisconnected;
   client.onConnected = onConnected;
   client.onSubscribed = onSubscribed;
@@ -19,10 +22,11 @@ MqttBrowserClient newMqttClient({required String mqttAddr}) {
   return client;
 }
 
-void Subscribe(
-    {required MqttBrowserClient client,
-    required String topic,
-    Function(String topic, String payload)? onUpdate}) {
+void Subscribe({
+  required MqttBrowserClient client,
+  required String topic,
+  Function(String topic, String payload)? onUpdate,
+}) {
   if (client.connectionStatus!.state != MqttConnectionState.connected) {
     print("ERROR::Client is invalid error");
     return;

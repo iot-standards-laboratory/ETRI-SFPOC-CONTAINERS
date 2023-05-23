@@ -34,6 +34,7 @@ func initService() {
 		model.ServerAddr = myIP[:idx+1] + "1:3000"
 		// model.ServerAddr = "localhost:3000"
 	}
+	// model.ServerAddr = "localhost:3000"
 
 	// for test
 	// {

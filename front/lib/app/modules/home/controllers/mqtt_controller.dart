@@ -8,7 +8,12 @@ class MQTTController {
   String? latestTopic;
   Function(String topic, String payload) onUpdate;
   MQTTController({required this.onUpdate, required this.mqttAddr}) {
-    mqttClient = newMqttClient(mqttAddr: mqttAddr);
+    var parsedAddress = Uri.parse(mqttAddr);
+
+    mqttClient = newMqttClient(
+        scheme: parsedAddress.scheme,
+        host: parsedAddress.host,
+        port: parsedAddress.port);
 
     final connMess = MqttConnectMessage()
         // .withClientIdentifier('service')
@@ -24,7 +29,7 @@ class MQTTController {
     try {
       await mqttClient!.connect("etrimqtt", "fainal2311");
       _subscribeChannel(topic: svcId);
-    } on Exception catch (e) {
+    } on Exception {
       mqttClient!.disconnect();
       return false;
     }

@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:front/app/modules/home/components/style/colors.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class BarChartCopmponent extends StatelessWidget {
   final double maxY;
