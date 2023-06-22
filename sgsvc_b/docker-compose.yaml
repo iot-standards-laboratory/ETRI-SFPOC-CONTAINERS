@@ -1,0 +1,12 @@
+version: '3.3'
+
+services:
+
+  sgsvc_b:
+    build: .
+    image: sgsvc_b:latest
+    hostname: sgsvc_b
+    container_name: sgsvc_b
+    restart: always
+    environment:
+      - "mode=managedbyedge"

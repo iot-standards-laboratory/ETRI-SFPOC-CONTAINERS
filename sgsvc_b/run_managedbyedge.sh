@@ -1,0 +1,1 @@
+mode="managedbyedge" go run main.go

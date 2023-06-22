@@ -1,0 +1,95 @@
+@sid = 4aec1528-42f2-4d09-b736-e2e3bd06803f
+
+@did = 8f63ba8b-a4e9-4325-89d9-8d60f8ba47eD
+@cid = 718b558a-7112-458a-8028-6899fc1c12e4
+@mid = 8309a610-cb4d-11ec-9451-0242ac110003
+
+@serverAddr = dsad:3000
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
+
+{
+    "did": "{{did}}",
+    "dname": "DEVICE-B-UUID",
+    "cid": "{{cid}}",
+    "sname": "devicemanagera"
+}
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/devs/list
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+
+{
+    "did": "{{did}}",
+    "dname": "DEVICE-B-UUID",
+    "cid": "{{cid}}",
+    "name": "measured data",
+    "status": {
+        "fan": false
+    }
+}
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+did: {{did}}
+
+
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
+    "status": {
+        "lamp": false
+    }
+}
+
+
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
+    "status": {
+        "fan": false,
+        "lamp": true
+    }
+}
+
+PUT http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
+
+{
+    "did": "{{did}}",
+    "status": {
+        "Temp": 50,
+        "Humidity": 10
+    }
+}
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+did: {{did}}
+
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/devs
+
+{
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
+    "dname": "DEVICE-A-UUID",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "sname": "devicemanagera"
+}
+
+POST http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+
+{
+    "did": "1ad73898-fe73-4053-8bbd-29a6ac6c927B",
+    "dname": "DEVICE-B-UUID",
+    "cid": "8971e21d-4800-47e4-b50e-691e28d2f701",
+    "status": {
+        "fan": false,
+        "lamp": false
+    }
+}
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status/{{mid}}
+
+GET http://{{serverAddr}}/svc/{{sid}}/api/v1/status/b9539103-c879-11ec-a28f-5254009af0ec

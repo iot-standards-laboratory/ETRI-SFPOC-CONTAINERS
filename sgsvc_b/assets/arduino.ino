@@ -1,45 +1,55 @@
-/*
-   IoT SMART FARM_V2
-*/
-
-#include <DHT_U.h>
-// #include <VitconBrokerComm.h>
+#define ITEM_COUNT 12
 #include <ArduinoJson.h>
-#include <SoftPWM.h>
-#include <U8g2lib.h> //U8g2 by oliver 라이브러리 설치 필요
+#include <GyverNTC.h>
+#include <Servo.h>
+Servo myservo;
+
+#include <U8g2lib.h>
 U8G2_SH1106_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
 
-// using namespace vitcon;
-#define DHTPIN A1
-#define DHTTYPE DHT22
-#define LAMP 17
-#define PUMP 16
-#define SOILHUMI A6
+#define NTC A1
+#define MagnetSW A2
+#define BUZZER 18
+#define PERSON A6
+#define LAMP_PWM 6
+#define LAMP_POWER 5
+#define SERVO 14
 
 #define GET 1
 #define POST 2
 #define PUT 3
 #define DELETE 4
 
-DHT_Unified dht(DHTPIN, DHTTYPE);
-SOFTPWM_DEFINE_CHANNEL(A3); // Arduino pin A3
-
-const char *firmware_version = "v0.3";
-const String sname = "SG-Service (Type A)";
-const String sid = "sgsvc_a";
-const String uuid = "etri-KYxUyaQ1=";
+const char *firmware_version = "v0.1";
+const String sname = "SG-Service (Type B)";
+const String sid = "sgsvc_b";
+const String uuid = "etri-ZTxkAuQ1";
 const long interval = 2000;
+
+// Variable for servo motor
+int pos;           // 서보모터 위치
+int openPos = 180; // 현관문을 열기 위한 서보모터의 각도 지정
+int closePos = 0;  // 현관문을 닫기 위한 서보모터의 각도 지정
+
+// Variable for lamp
+int light_level; // 트랙바에서 받는 LAMP 밝기 단계
+int pwm_real;    // LED 램프로 출력하는 PWM값
+
+// Variable for environmental value
+GyverNTC therm(1, 10000, 3435);
+float temp; // NTC 온도
+
+uint32_t OLEDOutputDelay = 3000; // ms
+uint32_t OLEDOutput_ST = 0;      // start time
 
 typedef struct _sensor {
   float temp;
-  float humi;
-  float soilHumi;
 } Sensor;
 
 typedef struct _actuator {
   bool led;
-  bool fan;
-  bool pump;
+  bool door;
+  bool buzzer;
 } Actuator;
 
 byte requestMessage[100];
@@ -55,49 +65,17 @@ void drawLogo() {
   u8g2.clearBuffer();
 
   u8g2.setFont(u8g2_font_ncenB08_te);
-  u8g2.drawStr(1, 15, "SF (etri-KYxUyaQ1=)");
+  u8g2.drawStr(1, 15, "SF (etri-ZTxkAuQ1)");
 
-  u8g2.drawStr(15, 36, "Temp.");
-  u8g2.setCursor(85, 36);
-  u8g2.print(sensor.temp);
-  u8g2.drawStr(114, 36, "\xb0");
-  u8g2.drawStr(119, 36, "C");
-
-  u8g2.drawStr(15, 47, "Humidity");
+  u8g2.drawStr(15, 47, "Temp.");
   u8g2.setCursor(85, 47);
-  u8g2.print(sensor.humi);
-  u8g2.drawStr(116, 47, "%");
-
-  u8g2.drawStr(15, 58, "Soil Humi.");
-  u8g2.setCursor(85, 58);
-  u8g2.print(sensor.soilHumi);
-  u8g2.drawStr(116, 58, "%");
+  u8g2.print(sensor.temp);
+  u8g2.drawStr(114, 47, "\xb0");
+  u8g2.drawStr(119, 47, "C");
 
   u8g2.sendBuffer();
 }
 
-void setup() {
-  Serial.begin(57600);
-  //   comm.SetInterval(200);
-
-  INFO["uuid"] = uuid;
-  INFO["sname"] = sname;
-  INFO["sid"] = sid;
-
-  pinMode(LAMP, OUTPUT);
-  pinMode(PUMP, OUTPUT);
-  pinMode(SOILHUMI, INPUT);
-  u8g2.begin();
-  dht.begin();
-  // begin with 60hz pwm frequency
-  SoftPWM.begin(490);
-
-  // 초기설정
-  digitalWrite(LAMP, LOW);
-  digitalWrite(PUMP, LOW);
-}
-
-// [0] -> code / [1] -> Token / [2] -> Length / [3~] -> Payload
 bool readRequestMessage() {
   uint8_t recvValue = 0;
   int messageLength = 0;
@@ -141,14 +119,12 @@ void handleQueryMessage() {
   } else if (query == "sensor") {
     StaticJsonDocument<100> js_sensor;
     js_sensor["temp"] = sensor.temp;
-    js_sensor["humi"] = sensor.humi;
-    js_sensor["soilHumi"] = sensor.soilHumi;
     sendMessageWithJson(205, tkn, js_sensor);
   } else if (query == "actuator") {
     StaticJsonDocument<100> js_actuator;
     js_actuator["led"] = actuator.led;
-    js_actuator["fan"] = actuator.fan;
-    js_actuator["pump"] = actuator.pump;
+    js_actuator["door"] = actuator.door;
+    js_actuator["buzzer"] = actuator.buzzer;
     sendMessageWithJson(205, tkn, js_actuator);
   }
 }
@@ -171,20 +147,20 @@ void handleControlMessage() {
     }
 
     actuatorToSync.led = doc["value"];
-  } else if (strcmp("fan", doc["path"]) == 0) {
+  } else if (strcmp("door", doc["path"]) == 0) {
     if (doc["value"] != true && doc["value"] != false) {
       sendMessageWithString(404, requestMessage[1], "invalid value error");
       return;
     }
 
-    actuatorToSync.fan = doc["value"];
-  } else if (strcmp("pump", doc["path"]) == 0) {
+    actuatorToSync.door = doc["value"];
+  } else if (strcmp("buzzer", doc["path"]) == 0) {
     if (doc["value"] != true && doc["value"] != false) {
       sendMessageWithString(404, requestMessage[1], "invalid value error");
       return;
     }
 
-    actuatorToSync.pump = doc["value"];
+    actuatorToSync.buzzer = doc["value"];
   } else {
     sendMessageWithString(404, requestMessage[1], "invalid path error");
     return;
@@ -226,35 +202,59 @@ void sendMessageWithString(uint8_t code, uint8_t token, char *payload) {
 void syncActuatorStatus() {
   if (actuator.led != actuatorToSync.led) {
     actuator.led = actuatorToSync.led;
-    digitalWrite(LAMP, actuator.led);
+    if (actuator.led)
+      analogWrite(LAMP_PWM, 0);
+    else
+      analogWrite(LAMP_PWM, 255);
   }
 
-  if (actuator.fan != actuatorToSync.fan) {
-    actuator.fan = actuatorToSync.fan;
-    SoftPWM.set(actuator.fan ? 65 : 0);
+  if (actuator.door != actuatorToSync.door) {
+    actuator.door = actuatorToSync.door;
+
+    if (actuator.door) {
+      pos = openPos;
+    } else {
+      pos = closePos;
+    }
+
+    myservo.write(pos);
   }
 
-  if (actuator.pump != actuatorToSync.pump) {
-    actuator.pump = actuatorToSync.pump;
-    digitalWrite(PUMP, actuator.pump);
+  if (actuator.buzzer != actuatorToSync.buzzer) {
+    actuator.buzzer = actuatorToSync.buzzer;
+    if (actuator.buzzer) {
+      digitalWrite(BUZZER, HIGH);
+    } else {
+      digitalWrite(BUZZER, LOW);
+    }
   }
 }
 
 void sensing() {
-  /* DHT22 data acquisition */
-  sensors_event_t event1;
-  sensors_event_t event2;
-
-  dht.temperature().getEvent(&event1); // DHT22_Temperature
-  sensor.temp = event1.temperature;
-
-  dht.humidity().getEvent(&event2); // DHT22_Humidity
-  sensor.humi = event2.relative_humidity;
-
-  sensor.soilHumi =
-      map(analogRead(SOILHUMI), 0, 1023, 100, 0); // soil humiditiy
-
+  sensor.temp = therm.getTempAverage();
   drawLogo();
+}
+
+void setup() {
+  Serial.begin(57600);
+
+  INFO["uuid"] = uuid;
+  INFO["sname"] = sname;
+  INFO["sid"] = sid;
+
+  u8g2.begin(); // oled가 연결되지 않으면 comm.Run()실행 에러
+
+  myservo.attach(SERVO); // 서보모터가 사용할 핀 설정(자동 pinMode설정포함)
+  pinMode(MagnetSW, INPUT_PULLUP);
+  pinMode(BUZZER, OUTPUT);
+  pinMode(LAMP_POWER, OUTPUT);
+  pinMode(LAMP_PWM, OUTPUT);
+
+  // 초기 설정
+  digitalWrite(LAMP_POWER, HIGH);
+  OLEDOutput_ST = millis();
+  pos = closePos;
+  myservo.write(pos);
 }
 
 unsigned long previousMillis = 0;
