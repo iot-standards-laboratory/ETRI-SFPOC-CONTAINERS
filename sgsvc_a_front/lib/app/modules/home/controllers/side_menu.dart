@@ -48,6 +48,7 @@ class SideMenu extends GetView<HomeController> {
                             : AppColors.iconGray,
                         BlendMode.srcIn,
                       ),
+                      width: 25,
                     ),
                     onPressed: () {
                       if (controller.scaffoldKey.currentState!.isDrawerOpen) {
@@ -55,7 +56,6 @@ class SideMenu extends GetView<HomeController> {
                           Get.back();
                         });
                       }
-
                       controller.updatePageIndex(0);
                     },
                   ),

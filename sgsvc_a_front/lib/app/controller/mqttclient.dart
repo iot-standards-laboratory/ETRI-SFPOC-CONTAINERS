@@ -2,16 +2,14 @@ import 'package:mqtt_client/mqtt_browser_client.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 MqttBrowserClient newMqttClient({
-  required String scheme,
-  required String host,
-  required int port,
+  required Uri uri,
 }) {
-  var client =
-      MqttBrowserClient('$scheme://$host', '', maxConnectionAttempts: 5);
+  var client = MqttBrowserClient('${uri.scheme}://${uri.host}${uri.path}', '',
+      maxConnectionAttempts: 5);
   client.logging(on: false);
   client.setProtocolV311();
   client.connectTimeoutPeriod = 10000;
-  client.port = port;
+  client.port = uri.port;
   client.onDisconnected = onDisconnected;
   client.onConnected = onConnected;
   client.onSubscribed = onSubscribed;

@@ -11,9 +11,8 @@ class MQTTController {
     var parsedAddress = Uri.parse(mqttAddr);
 
     mqttClient = newMqttClient(
-        scheme: parsedAddress.scheme,
-        host: parsedAddress.host,
-        port: parsedAddress.port);
+      uri: parsedAddress,
+    );
 
     final connMess = MqttConnectMessage()
         // .withClientIdentifier('service')
