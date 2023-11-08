@@ -27,6 +27,7 @@ func Connect(consulAgent string) error {
 
 	if consulAgentUrl.Host != "" {
 		consulConfig.Address = consulAgentUrl.Host
+		consulConfig.PathPrefix = "/consul"
 	}
 
 	if consulAgentUrl.Scheme != "" {
