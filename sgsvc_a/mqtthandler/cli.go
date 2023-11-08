@@ -29,6 +29,7 @@ func ConnectMQTT(mqttAddr, id string) error {
 	opts.SetPingTimeout(1 * time.Second)
 	opts.SetUsername(user)
 	opts.SetPassword(passwd)
+	opts.SetAutoReconnect(true)
 
 	client = mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {

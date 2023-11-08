@@ -38,7 +38,7 @@ func initService() {
 
 	// for test
 	// {
-	// 	model.ServerAddr = "192.168.0.9:3000" // for test
+	// 	model.ServerAddr = "10.113.206.183:3000" // for test
 	// }
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s/api/v2/svcs", model.ServerAddr), nil)
@@ -48,7 +48,6 @@ func initService() {
 
 	req.Header.Add("id", "sgsvc_a")
 	// req.Header.Add("port", config.Params["bind"].(string))
-
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)

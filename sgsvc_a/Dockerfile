@@ -5,7 +5,8 @@ RUN apk update && \
 RUN mkdir /home/build
 COPY . /home/build
 WORKDIR /home/build
-RUN go mod tidy && go build -o app
+RUN go mod tidy
+RUN go build -o app main.go
 
 FROM alpine:latest
 ARG PUID=2000
