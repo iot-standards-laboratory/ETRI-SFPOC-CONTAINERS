@@ -10,7 +10,7 @@ import 'app/routes/app_pages.dart';
 void main() {
   serverAddr = kIsWeb && !kDebugMode
       ? '${Uri.base.host}:${Uri.base.port}'
-      : 'localhost:3456';
+      : '10.37.69.251:3456';
   runApp(
     GetMaterialApp(
       title: "Application",

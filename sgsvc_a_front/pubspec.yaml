@@ -13,11 +13,11 @@ dependencies:
   get_cli: 1.8.1
   google_fonts: ^6.1.0
   mqtt_client: ^10.0.0
-  syncfusion_flutter_charts: ^23.1.44
+  syncfusion_flutter_charts: ^24.1.41
   loading_indicator: ^3.1.1
   flutter_svg: ^2.0.9
   smooth_page_indicator: ^1.1.0
-  fl_chart: ^0.64.0
+  fl_chart: ^0.65.0
   flutter_web_plugins:
     sdk: flutter
   http: ^1.1.0
