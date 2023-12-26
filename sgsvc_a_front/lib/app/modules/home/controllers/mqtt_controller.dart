@@ -24,10 +24,10 @@ class MQTTController {
     mqttClient!.connectionMessage = connMess;
   }
 
-  Future<bool> connect(String svcId) async {
+  Future<bool> connect({required String topic}) async {
     try {
       await mqttClient!.connect("etrimqtt", "fainal2311");
-      _subscribeChannel(topic: svcId);
+      _subscribeChannel(topic: topic);
     } on Exception {
       mqttClient!.disconnect();
       return false;
@@ -39,6 +39,7 @@ class MQTTController {
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       // print('');
 
+      print("recv: $pt");
       onUpdate(c[0].topic, pt);
     });
 

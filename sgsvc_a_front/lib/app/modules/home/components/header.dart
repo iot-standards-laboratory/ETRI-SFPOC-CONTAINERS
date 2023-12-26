@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:front/app/model/controller.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../controllers/home_controller.dart';
 import 'style/colors.dart';
 
 class Header extends StatelessWidget {
   const Header({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,31 +50,6 @@ class Header extends StatelessWidget {
                               color: AppColors.secondary, fontSize: 14)),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  GetBuilder<HomeController>(
-                    id: "reload",
-                    builder: (controller) {
-                      return SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: PopupMenuButton<Controller>(
-                          onSelected: (value) {
-                            controller.updateSelectedCtrl(value);
-                          },
-                          itemBuilder: (context) {
-                            return controller.ctrls
-                                .map(
-                                  (e) => PopupMenuItem<Controller>(
-                                    value: e,
-                                    child: Text(e.name),
-                                  ),
-                                )
-                                .toList();
-                          },
-                        ),
-                      );
-                    },
-                  )
                 ],
               ),
             ),
@@ -104,7 +75,6 @@ class PopupMenuButtonShape extends StatelessWidget {
         width: 40,
         height: 40,
         // margin: const EdgeInsets.only(left: defaultPadding),
-
         decoration: BoxDecoration(
           color: AppColors.secondaryBg.withOpacity(0.5),
           borderRadius: const BorderRadius.all(Radius.circular(20)),

@@ -198,32 +198,18 @@ class HomeController extends GetxController {
 
   Config? svcConfig;
 
-  var ctrls = <Controller>[];
-  Controller? selectedCtrl;
+  String? selectedCtrlId;
   late MQTTController _mqttController;
 
   Future<void> load() async {
     svcConfig = await loadConfig();
-    ctrls = svcConfig!.ctrls;
+    selectedCtrlId = svcConfig!.ctrlId;
 
-    if (ctrls.isEmpty) {
-      _mqttController.unsubscribeChannel(topic: _mqttController.latestTopic);
-      temperature.value = 0;
-      humidity.value = 0;
-      co2.value = 0;
-      led.value = false;
-      ventilationFan.value = false;
-      selectedCtrl = null;
-    }
-    // if (selectedCtrl == null) {
-    //   updateSelectedCtrl(ctrls[0]);
-    // }
     update(["reload"]);
   }
 
   void init() async {
     await load();
-
     if (svcConfig == null) {
       return;
     }
@@ -235,6 +221,7 @@ class HomeController extends GetxController {
           load();
         } else {
           var obj = jsonDecode(payload);
+
           if (topic.endsWith("/sensor")) {
             temperature.value = obj['temp'] ?? temperature.value;
             humidity.value = obj['humi'] ?? humidity.value;
@@ -249,28 +236,10 @@ class HomeController extends GetxController {
       },
     );
 
-    var ok = await _mqttController.connect(svcConfig!.serviceId);
-
-    if (selectedCtrl == null && ctrls.isNotEmpty) {
-      updateSelectedCtrl(ctrls[0]);
-    }
+    var ok = await _mqttController.connect(topic: '$selectedCtrlId/content/#');
   }
 
   var b_timeout = false;
-
-  void updateSelectedCtrl(Controller ctrl) {
-    selectedCtrl = ctrl;
-    _mqttController.updateSubscribeChannel(
-        topic: '${selectedCtrl!.reportChan}/#');
-
-    var msgBuilder = MqttClientPayloadBuilder();
-    msgBuilder.addString('actuator');
-    _mqttController.publish('${selectedCtrl!.controlChan}/get', msgBuilder);
-
-    msgBuilder.clear();
-    msgBuilder.addString('sensor');
-    _mqttController.publish('${selectedCtrl!.controlChan}/get', msgBuilder);
-  }
 
   void publishMessage(String path, dynamic value) {
     try {
@@ -287,9 +256,9 @@ class HomeController extends GetxController {
       Future.delayed(const Duration(seconds: 3), () {
         b_timeout = false;
       });
-      if (selectedCtrl != null) {
-        _mqttController.publish(
-            '${selectedCtrl!.controlChan}/post', msgBuilder);
+      if (selectedCtrlId != null) {
+        print("publish to $selectedCtrlId/post");
+        _mqttController.publish('$selectedCtrlId/post', msgBuilder);
       }
     } catch (e) {
       print(e.toString());

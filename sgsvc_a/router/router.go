@@ -1,9 +1,9 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"sgsvca/model"
-	"sgsvca/model/cachestorage"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -18,12 +18,11 @@ func NewRouter(svcId string) *gin.Engine {
 	api := apiEngine.Group(prefix + "/api/")
 	{
 		api.GET("/init", func(ctx *gin.Context) {
-			ctx.Writer.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-			ctx.Writer.Header().Set("Pragma", "no-cache")
+			fmt.Println("/init")
 			params := map[string]interface{}{
 				"mqtt_address": model.MQTTAddr,
 				"service_id":   model.SvcId,
-				"ctrls":        cachestorage.GetCtrls(),
+				// "ctrls":        cachestorage.GetCtrls(),
 			}
 			ctx.JSON(http.StatusOK, params)
 		})
@@ -36,6 +35,11 @@ func NewRouter(svcId string) *gin.Engine {
 	r := gin.New()
 
 	r.Any("/*any", func(c *gin.Context) {
+		c.Writer.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+		c.Writer.Header().Add("Pragma", "no-cache")
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+
 		path := c.Param("any")
 		if strings.HasPrefix(path, prefix+"/api/") {
 			apiEngine.HandleContext(c)

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:front/app/model/controller.dart';
 import 'package:front/app/modules/home/views/historical_monitoring_board.dart';
 import 'package:front/app/modules/home/views/monitoring_board.dart';
 
@@ -102,30 +101,7 @@ class HomeView extends GetView<HomeController> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: GetBuilder<HomeController>(
-                        id: "reload",
-                        builder: (controller) {
-                          return PopupMenuButton<Controller>(
-                            onSelected: (value) {
-                              controller.updateSelectedCtrl(value);
-                            },
-                            itemBuilder: (context) {
-                              return controller.ctrls
-                                  .map(
-                                    (e) => PopupMenuItem<Controller>(
-                                      value: e,
-                                      child: Text(e.name),
-                                    ),
-                                  )
-                                  .toList();
-                            },
-                          );
-                        }),
-                  ),
-                ],
+                actions: [],
               )
             : const PreferredSize(
                 preferredSize: Size.zero,

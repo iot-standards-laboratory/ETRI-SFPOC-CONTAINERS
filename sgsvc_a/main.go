@@ -24,7 +24,8 @@ func initService() {
 	// 	// model.ServerAddr = "localhost:3000"
 	// }
 
-	model.ServerAddr = "host.docker.internal:9995"
+	// model.ServerAddr = "host.docker.internal:9995"
+	model.ServerAddr = "code.godopu.com:9995"
 
 	_uuid := os.Getenv("uuid")
 	fmt.Println(_uuid)
@@ -127,8 +128,9 @@ func connectConsul(svcId, consulAddr, originAddr string) error {
 func main() {
 	// init
 	flag.Parse()
+	fmt.Println("Hello world")
 	initService()
-	makeIndex()
+	// makeIndex()
 	// model.PrintParam()
 	// err := connectConsul(model.SvcId, model.ConsulAddr, model.Origin)
 	// if err != nil {
