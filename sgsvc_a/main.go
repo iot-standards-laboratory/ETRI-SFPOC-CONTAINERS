@@ -24,8 +24,8 @@ func initService() {
 	// 	// model.ServerAddr = "localhost:3000"
 	// }
 
-	// model.ServerAddr = "host.docker.internal:9995"
-	model.ServerAddr = "code.godopu.com:9995"
+	model.ServerAddr = "host.docker.internal:9995"
+	// model.ServerAddr = "code.godopu.com:9995"
 
 	_uuid := os.Getenv("uuid")
 	fmt.Println(_uuid)

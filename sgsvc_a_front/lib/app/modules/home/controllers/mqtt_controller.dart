@@ -39,7 +39,6 @@ class MQTTController {
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       // print('');
 
-      print("recv: $pt");
       onUpdate(c[0].topic, pt);
     });
 

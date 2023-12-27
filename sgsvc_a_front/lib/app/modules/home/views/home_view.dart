@@ -14,7 +14,7 @@ import '../components/style/colors.dart';
 import 'settings_board.dart';
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({Key? key}) : super(key: key);
+  const HomeView({super.key});
 
   Widget renderBoard(int idx, BuildContext context) {
     return IndexedStack(
