@@ -3,7 +3,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:front/app/routes/app_pages.dart';
 
 void setPathUrlStrategy() {
-  setUrlStrategy(PathUrlStrategy());
+  setUrlStrategy(const PathUrlStrategy());
   usePathUrlStrategy();
 }
 

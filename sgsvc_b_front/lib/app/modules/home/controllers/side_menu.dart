@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:front/app/modules/home/common/dialog.dart';
 import 'package:front/app/modules/home/controllers/home_controller.dart';
 import 'package:get/get.dart';
 import '../components/style/colors.dart';
 
 class SideMenu extends GetView<HomeController> {
   const SideMenu({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,7 @@ class SideMenu extends GetView<HomeController> {
                             : AppColors.iconGray,
                         BlendMode.srcIn,
                       ),
+                      width: 25,
                     ),
                     onPressed: () {
                       if (controller.scaffoldKey.currentState!.isDrawerOpen) {
@@ -55,7 +57,6 @@ class SideMenu extends GetView<HomeController> {
                           Get.back();
                         });
                       }
-
                       controller.updatePageIndex(0);
                     },
                   ),
@@ -75,13 +76,14 @@ class SideMenu extends GetView<HomeController> {
                           : AppColors.iconGray,
                     ),
                     onPressed: () {
-                      if (controller.scaffoldKey.currentState!.isDrawerOpen) {
-                        Future.delayed(const Duration(milliseconds: 220), () {
-                          Get.back();
-                        });
-                      }
+                      makeDialog(context);
+                      // if (controller.scaffoldKey.currentState!.isDrawerOpen) {
+                      //   Future.delayed(const Duration(milliseconds: 220), () {
+                      //     Get.back();
+                      //   });
+                      // }
 
-                      controller.updatePageIndex(1);
+                      // controller.updatePageIndex(1);
                     },
                   ),
                 ),

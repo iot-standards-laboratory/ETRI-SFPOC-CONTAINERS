@@ -7,46 +7,27 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"sgsvcb/consul_api"
 	"sgsvcb/model"
-	"sgsvcb/model/cachestorage"
 	"sgsvcb/mqtthandler"
 	"sgsvcb/router"
 	"strings"
-
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func getIP() string {
-	host, _ := os.Hostname()
-	addrs, _ := net.LookupIP(host)
-
-	return addrs[0].String()
-}
-
 func initService() {
-	{
-		myIP := getIP()
-		idx := strings.LastIndex(myIP, ".")
-		model.ServerAddr = myIP[:idx+1] + "1:3000"
-		// model.ServerAddr = "localhost:3000"
-	}
-	// model.ServerAddr = "localhost:3000"
 
-	// for test
-	// {
-	// 	model.ServerAddr = "192.168.0.34:3000" // for test
-	// }
+	model.ServerAddr = "host.docker.internal:9995"
+
+	_uuid := os.Getenv("uuid")
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s/api/v2/svcs", model.ServerAddr), nil)
 	if err != nil {
 		panic(err)
 	}
 
-	req.Header.Add("id", "sgsvc_b")
+	req.Header.Add("id", _uuid)
 	// req.Header.Add("port", config.Params["bind"].(string))
 
 	resp, err := http.DefaultClient.Do(req)
@@ -66,11 +47,6 @@ func initService() {
 		panic(errors.New("invalid connection parameters error"))
 	}
 
-	info, ok := payload["info"].(map[string]interface{})
-	if !ok {
-		panic(errors.New("invalid service information error"))
-	}
-
 	origin, ok := payload["origin"].(string)
 	if !ok {
 		panic(errors.New("invalid origin address error"))
@@ -84,15 +60,11 @@ func initService() {
 	if !ok {
 		panic(errors.New("invalid mqtt address error"))
 	}
-	containerId, ok := info["cid"].(string)
-	if !ok {
-		panic(errors.New("invalid service id error"))
-	}
 
 	model.ConsulAddr = consulAddr.(string)
 	model.MQTTAddr = mqttAddr.(string)
 	model.Origin = origin
-	model.SvcId = containerId
+	model.SvcId = _uuid
 }
 
 func makeIndex() {
@@ -150,27 +122,9 @@ func main() {
 	// init
 	flag.Parse()
 	initService()
-	makeIndex()
-	// model.PrintParam()
-	err := connectConsul(model.SvcId, model.ConsulAddr, model.Origin)
-	if err != nil {
-		panic(err)
-	}
-	mqtthandler.MQTTHandler = func(client mqtt.Client, msg mqtt.Message) {
-		if strings.Compare(msg.Topic(), "public/statuschanged") == 0 {
-			cachestorage.QueryCtrls("sgsvc_b")
-		}
-	}
-	err = mqtthandler.ConnectMQTT("wss://mqtt.godopu.com", model.SvcId)
-	if err != nil {
-		panic(err)
-	}
-	err = mqtthandler.Subscribe("public/statuschanged")
-	if err != nil {
-		panic(err)
-	}
+	// makeIndex()
 
-	err = cachestorage.QueryCtrls("sgsvc_b")
+	err := mqtthandler.ConnectMQTT("wss://mqtt.godopu.com", model.SvcId)
 	if err != nil {
 		panic(err)
 	}

@@ -40,8 +40,6 @@ class CropControlBoard extends GetView<HomeController> {
                     GetX<HomeController>(builder: (ctrl) {
                       return CropControlComponent(
                         label: "LED",
-                        onLabel: "켜짐",
-                        offLabel: "꺼짐",
                         status: ctrl.led.value,
                         isAuto: ctrl.isLedAuto.value,
                         width: width,
@@ -60,44 +58,113 @@ class CropControlBoard extends GetView<HomeController> {
                     }),
                     GetX<HomeController>(builder: (ctrl) {
                       return CropControlComponent(
-                        label: "환기 도어",
-                        onLabel: "열림",
-                        offLabel: "닫힘",
-                        status: ctrl.ventilationDoor.value,
-                        isAuto: ctrl.isVentilationDoorAuto.value,
+                        label: "환기 팬",
+                        status: ctrl.ventilationFan.value,
+                        isAuto: ctrl.isVentilationFanAuto.value,
                         width: width,
                         backgroundColor: AppColors.white,
                         onCheckBoxChanged: (b) {
-                          ctrl.isVentilationDoorAuto.value = b!;
+                          ctrl.isVentilationFanAuto.value = b!;
                         },
                         onStatusChanged: ctrl.isLedAuto.value
                             ? null
                             : (b) {
-                                if (ctrl.ventilationDoor.value == b) return;
+                                if (ctrl.ventilationFan.value == b) return;
                                 // ctrl.ventilationFan.value = b;
-                                ctrl.publishMessage('door', b);
+                                ctrl.publishMessage('fan', b);
                               },
                       );
                     }),
                     GetX<HomeController>(builder: (ctrl) {
                       return CropControlComponent(
-                        label: "알림",
-                        onLabel: "켜짐",
-                        offLabel: "꺼짐",
-                        status: ctrl.buzzer.value,
-                        isAuto: ctrl.isBuzzerAuto.value,
+                        label: "순환 서큘레이터",
+                        status: ctrl.circulator.value,
+                        isAuto: ctrl.isCirculatorAuto.value,
                         width: width,
                         backgroundColor: AppColors.white,
                         onCheckBoxChanged: (b) {
-                          ctrl.buzzer.value = b!;
+                          ctrl.isCirculatorAuto.value = b!;
                         },
                         onStatusChanged: (b) {
-                          if (ctrl.buzzer.value == b) return;
-                          ctrl.publishMessage('buzzer', b);
+                          ctrl.circulator.value = b;
+                        },
+                      );
+                    }),
+                    GetX<HomeController>(builder: (ctrl) {
+                      return CropControlComponent(
+                        label: "냉/난방기 ",
+                        status: ctrl.airConditioner.value,
+                        isAuto: ctrl.isAirConditionerAuto.value,
+                        width: width,
+                        backgroundColor: AppColors.white,
+                        onCheckBoxChanged: (b) {
+                          ctrl.isAirConditionerAuto.value = b!;
+                        },
+                        onStatusChanged: (b) {
+                          ctrl.airConditioner.value = b;
                         },
                       );
                     }),
                   ],
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 2,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '관수 시스템',
+                        style: GoogleFonts.sofia(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      ScrollConfiguration(
+                        behavior: const MaterialScrollBehavior().copyWith(
+                            dragDevices: {
+                              PointerDeviceKind.mouse,
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.stylus
+                            }),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                              children: List<Widget>.generate(
+                                  controller.irrigationSystem.length, (idx) {
+                            return Obx(() {
+                              return CropControlComponent(
+                                label: '${idx + 1}단',
+                                status: controller.irrigationSystem[0].value,
+                                isAuto:
+                                    controller.isIrrigationSystemAuto[0].value,
+                                width: 220,
+                                backgroundColor: AppColors.white,
+                                onCheckBoxChanged: (b) {
+                                  controller.isIrrigationSystemAuto[0].value =
+                                      b!;
+                                },
+                                onStatusChanged: (b) {
+                                  if (controller.irrigationSystem[0].value ==
+                                      b) {
+                                    return;
+                                  }
+                                  // ctrl.ventilationFan.value = b;
+                                  controller.publishMessage('pump', b);
+                                },
+                              );
+                            });
+                          }).toList()),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             )
@@ -110,8 +177,6 @@ class CropControlBoard extends GetView<HomeController> {
 
 class CropControlComponent extends StatelessWidget {
   final String label;
-  final String onLabel;
-  final String offLabel;
   final double width;
   final bool status;
   final bool isAuto;
@@ -123,8 +188,6 @@ class CropControlComponent extends StatelessWidget {
     required this.label,
     required this.status,
     required this.isAuto,
-    required this.onLabel,
-    required this.offLabel,
     this.width = 0,
     this.onStatusChanged,
     this.onCheckBoxChanged,
@@ -187,7 +250,7 @@ class CropControlComponent extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
-                              onLabel,
+                              "켜짐",
                               style: GoogleFonts.bebasNeue(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -223,7 +286,7 @@ class CropControlComponent extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
-                              offLabel,
+                              "꺼짐",
                               style: GoogleFonts.bebasNeue(
                                 color: Colors.white,
                                 fontSize: 16,

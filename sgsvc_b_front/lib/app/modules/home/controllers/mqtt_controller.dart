@@ -11,9 +11,8 @@ class MQTTController {
     var parsedAddress = Uri.parse(mqttAddr);
 
     mqttClient = newMqttClient(
-        scheme: parsedAddress.scheme,
-        host: parsedAddress.host,
-        port: parsedAddress.port);
+      uri: parsedAddress,
+    );
 
     final connMess = MqttConnectMessage()
         // .withClientIdentifier('service')
@@ -25,10 +24,10 @@ class MQTTController {
     mqttClient!.connectionMessage = connMess;
   }
 
-  Future<bool> connect(String svcId) async {
+  Future<bool> connect({required String topic}) async {
     try {
       await mqttClient!.connect("etrimqtt", "fainal2311");
-      _subscribeChannel(topic: svcId);
+      _subscribeChannel(topic: topic);
     } on Exception {
       mqttClient!.disconnect();
       return false;

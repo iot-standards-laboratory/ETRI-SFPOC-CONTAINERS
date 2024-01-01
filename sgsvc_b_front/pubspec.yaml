@@ -3,27 +3,27 @@ version: 1.0.0+1
 publish_to: none
 description: A new Flutter project.
 environment:
-  sdk: ">=2.18.4 <3.0.0"
+  sdk: '>=3.1.5 <4.0.0'
 
 dependencies:
-  cupertino_icons: ^1.0.2
-  get: 4.6.5
+  cupertino_icons: ^1.0.6
+  get: ^4.6.6
   flutter:
     sdk: flutter
-  get_cli: ^1.8.1
-  google_fonts: ^4.0.3
-  mqtt_client: ^9.7.2
-  syncfusion_flutter_charts: ^20.3.56
-  loading_indicator: ^3.1.0
-  flutter_svg: ^2.0.3
-  smooth_page_indicator: ^1.0.0+2
-  fl_chart: ^0.61.0
+  get_cli: 1.8.1
+  google_fonts: ^6.1.0
+  mqtt_client: ^10.0.0
+  syncfusion_flutter_charts: ^24.1.41
+  loading_indicator: ^3.1.1
+  flutter_svg: ^2.0.9
+  smooth_page_indicator: ^1.1.0
+  fl_chart: ^0.66.0
   flutter_web_plugins:
     sdk: flutter
-  http: ^0.13.5
+  http: ^1.1.0
 
 dev_dependencies:
-  flutter_lints: 2.0.1
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
 

@@ -18,8 +18,7 @@ func NewRouter(svcId string) *gin.Engine {
 	api := apiEngine.Group(prefix + "/api/")
 	{
 		api.GET("/init", func(ctx *gin.Context) {
-			ctx.Writer.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-			ctx.Writer.Header().Set("Pragma", "no-cache")
+
 			params := map[string]interface{}{
 				"mqtt_address": model.MQTTAddr,
 				"service_id":   model.SvcId,
@@ -37,6 +36,10 @@ func NewRouter(svcId string) *gin.Engine {
 
 	r.Any("/*any", func(c *gin.Context) {
 		path := c.Param("any")
+		c.Writer.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+		c.Writer.Header().Add("Pragma", "no-cache")
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		if strings.HasPrefix(path, prefix+"/api/") {
 			apiEngine.HandleContext(c)
 		} else if strings.HasPrefix(path, prefix) {

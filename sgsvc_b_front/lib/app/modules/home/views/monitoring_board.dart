@@ -24,6 +24,10 @@ class MonitoringBoard extends GetView<HomeController> {
         SizedBox(
           height: SizeConfig.blockSizeVertical * 2,
         ),
+        const CropGrowthBoard(),
+        SizedBox(
+          height: SizeConfig.blockSizeVertical * 6,
+        ),
         const CropMonitoringBoard(),
         SizedBox(
           height: SizeConfig.blockSizeVertical * 6,

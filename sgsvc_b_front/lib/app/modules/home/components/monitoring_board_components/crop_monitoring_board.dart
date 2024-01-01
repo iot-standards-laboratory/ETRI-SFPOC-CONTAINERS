@@ -38,6 +38,24 @@ class CropMonitoringBoard extends StatelessWidget {
                     unit: "");
               },
             ),
+            GetX<HomeController>(
+              builder: (ctrl) {
+                return CropMonitoringComponent(
+                    label: "습도",
+                    sublabel: "",
+                    value: ctrl.humidity.value,
+                    unit: "%");
+              },
+            ),
+            GetX<HomeController>(
+              builder: (ctrl) {
+                return CropMonitoringComponent(
+                    label: "지습",
+                    sublabel: "",
+                    value: ctrl.co2.value,
+                    unit: "%");
+              },
+            ),
           ],
         ),
       ],
@@ -100,7 +118,7 @@ class CropMonitoringComponent extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            '${value.toStringAsFixed(2)}',
+            '$value',
             style: GoogleFonts.almendraSc(
               fontSize: 36,
               fontWeight: FontWeight.w800,
